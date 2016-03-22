@@ -27,42 +27,35 @@ import org.jenkinsci.remoting.RoleChecker;
 import org.jenkinsci.remoting.RoleSensitive;
 import java.io.Serializable;
 
+import org.apache.tools.ant.types.FileSet;
+import org.apache.tools.ant.DirectoryScanner;
+
 public class FileDeleteOperation extends FileOperation implements Serializable { 
-	private final String FileName;
+	private final String includes;
+	private final String excludes;
 	@DataBoundConstructor 
-	 public FileDeleteOperation(String FileName) { 
-		this.FileName = FileName;
+	 public FileDeleteOperation(String includes, String excludes) { 
+		this.includes = includes;
+		this.excludes = excludes;
 	 }
 
-	 public String getFileName()
+	 public String getIncludes()
 	 {
-		 return FileName;
+		 return includes;
 	 }
+	 public String getExcludes()
+	 {
+		 return excludes;
+	 }
+	 
 	 public boolean RunOperation(AbstractBuild build, Launcher launcher, BuildListener listener) {
 		 boolean result = false;
 		 try
 			{
-				FilePath targetFilePath = new FilePath(build.getWorkspace(), build.getEnvironment(listener).expand(FileName)); 
-				try{
-					if(!targetFilePath.exists())
-					{
-						listener.getLogger().println(targetFilePath.getName() + " file doesn't exists");
-						return false;
-					}
-				}
-				catch(RuntimeException e)
-				{
-					listener.getLogger().println(targetFilePath.getName() + " file doesn't exists");
-					throw e;
-				}
-				catch(Exception e)
-				{
-					listener.getLogger().println(targetFilePath.getName() + " file doesn't exists");
-					return false;
-				}	
+				FilePath ws = build.getWorkspace(); 				
 				
 				try {	
-					result = targetFilePath.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(FileName)));				
+					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(includes), build.getEnvironment(listener).expand(excludes)));				
 				}
 				catch (Exception e) {
 					e.printStackTrace(listener.getLogger());
@@ -80,15 +73,73 @@ public class FileDeleteOperation extends FileOperation implements Serializable {
 	private static final class TargetFileCallable implements FileCallable<Boolean> {
 		private static final long serialVersionUID = 1;
 		private final BuildListener listener;
-		private final String resolvedFileName;
-		public TargetFileCallable(BuildListener Listener, String ResolvedFileName) {
+		private final String resolvedIncludes;
+		private final String resolvedExcludes;
+		public TargetFileCallable(BuildListener Listener, String ResolvedIncludes, String ResolvedExcludes) {
 			this.listener = Listener;
-			this.resolvedFileName = ResolvedFileName;			
+			this.resolvedIncludes = ResolvedIncludes;	
+			this.resolvedExcludes = ResolvedExcludes;			
 		}
-		@Override public Boolean invoke(File targetFile, VirtualChannel channel) {
-			String fileName = targetFile.getName();
-			boolean result = targetFile.delete();		
-			listener.getLogger().println(fileName + " deleted successfully.");
+		@Override public Boolean invoke(File ws, VirtualChannel channel) {
+			boolean result = false;
+			try {
+				FilePath fpWS = new FilePath(ws);
+				FilePath[] resolvedFiles = fpWS.list(resolvedIncludes, resolvedExcludes);
+				if(resolvedFiles.length == 0)
+				{
+					listener.getLogger().println("0 files found for include pattern '" + resolvedIncludes + "' and exclude pattern '" + resolvedExcludes +"'");
+					result = true;
+				}
+				for (FilePath fp : resolvedFiles) { 
+					listener.getLogger().println("Deleting " + fp.getName() + "....");
+					if(fp.isDirectory())
+					{
+						try
+						{
+							fp.deleteRecursive();
+							result = true;
+							listener.getLogger().println("Success.");
+						}
+						catch(RuntimeException e)
+						{
+							listener.getLogger().println("Failed to delete.");
+							throw e;
+						}
+						catch(Exception e)
+						{
+							listener.getLogger().println("Failed to delete.");
+							result = false;
+						}
+					}
+					else
+					{
+						try
+						{
+							result = fp.delete();
+							listener.getLogger().println("Success.");
+						}
+						catch(RuntimeException e)
+						{
+							listener.getLogger().println("Failed to delete.");
+							throw e;
+						}
+						catch(Exception e)
+						{
+							listener.getLogger().println("Failed to delete.");
+							result = false;
+						}
+					}
+					
+				}
+			}
+			catch(RuntimeException e)
+			{
+				throw e;
+			}
+			catch(Exception e)
+			{
+				result = false;
+			}
 			return result;	
 		}
 		
