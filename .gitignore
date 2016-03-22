@@ -1,0 +1,26 @@
+# Mac OS X files
+.DS_Store
+
+# Intellij files
+*.iml
+.idea/*
+classes
+
+# Maven
+target/*
+pom.xml.releaseBackup
+release.properties
+
+# Jenkins workplace files
+work*
+
+# Gradle
+.gradle
+build
+libsrc/*
+
+# Eclipse
+/.classpath
+/.project
+/.settings*
+/target/
