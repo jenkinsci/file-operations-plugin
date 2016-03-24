@@ -1,0 +1,12 @@
+<?jelly escape-by-default='true'?> 
+<j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form">
+ <f:entry title="Include File Pattern">
+ <f:textbox field="includes" />
+ </f:entry>
+ <f:entry title="Exclude File Pattern">
+ <f:textbox field="excludes" />
+ </f:entry>
+ <f:entry title="Target Location">
+ <f:textbox field="targetLocation" />
+ </f:entry>
+</j:jelly> 

@@ -27,13 +27,15 @@ import org.jenkinsci.remoting.RoleChecker;
 import org.jenkinsci.remoting.RoleSensitive;
 import java.io.Serializable;
 
-public class FileDeleteOperation extends FileOperation implements Serializable { 
+public class FileCopyOperation extends FileOperation implements Serializable { 
 	private final String includes;
 	private final String excludes;
+	private final String targetLocation;
 	@DataBoundConstructor 
-	 public FileDeleteOperation(String includes, String excludes) { 
+	 public FileCopyOperation(String includes, String excludes, String targetLocation) { 
 		this.includes = includes;
 		this.excludes = excludes;
+		this.targetLocation = targetLocation;
 	 }
 
 	 public String getIncludes()
@@ -44,7 +46,10 @@ public class FileDeleteOperation extends FileOperation implements Serializable {
 	 {
 		 return excludes;
 	 }
-	 
+	 public String getTargetLocation()
+	 {
+		 return targetLocation;
+	 }
 	 public boolean RunOperation(AbstractBuild build, Launcher launcher, BuildListener listener) {
 		 boolean result = false;
 		 try
@@ -52,7 +57,7 @@ public class FileDeleteOperation extends FileOperation implements Serializable {
 				FilePath ws = build.getWorkspace(); 				
 				
 				try {	
-					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(includes), build.getEnvironment(listener).expand(excludes)));				
+					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(includes), build.getEnvironment(listener).expand(excludes), build.getEnvironment(listener).expand(targetLocation)));				
 				}
 				catch (Exception e) {
 					e.printStackTrace(listener.getLogger());
@@ -72,62 +77,33 @@ public class FileDeleteOperation extends FileOperation implements Serializable {
 		private final BuildListener listener;
 		private final String resolvedIncludes;
 		private final String resolvedExcludes;
-		public TargetFileCallable(BuildListener Listener, String ResolvedIncludes, String ResolvedExcludes) {
+		private final String resolvedTargetLocation;
+		public TargetFileCallable(BuildListener Listener, String ResolvedIncludes, String ResolvedExcludes, String ResolvedTargetLocation) {
 			this.listener = Listener;
 			this.resolvedIncludes = ResolvedIncludes;	
-			this.resolvedExcludes = ResolvedExcludes;			
+			this.resolvedExcludes = ResolvedExcludes;
+			this.resolvedTargetLocation = ResolvedTargetLocation;
 		}
 		@Override public Boolean invoke(File ws, VirtualChannel channel) {
 			boolean result = false;
 			try {
 				FilePath fpWS = new FilePath(ws);
+				FilePath fpTL = new FilePath(fpWS, resolvedTargetLocation);
 				FilePath[] resolvedFiles = fpWS.list(resolvedIncludes, resolvedExcludes);
 				if(resolvedFiles.length == 0)
 				{
 					listener.getLogger().println("0 files found for include pattern '" + resolvedIncludes + "' and exclude pattern '" + resolvedExcludes +"'");
 					result = true;
 				}
-				for (FilePath fp : resolvedFiles) { 
-					listener.getLogger().println(fp.getRemote() + " deleting....");
-					if(fp.isDirectory())
+				else
+				{
+					for(FilePath item : resolvedFiles)
 					{
-						try
-						{
-							fp.deleteRecursive();
-							result = true;
-							listener.getLogger().println("Success.");
-						}
-						catch(RuntimeException e)
-						{
-							listener.getLogger().println("Failed to delete.");
-							throw e;
-						}
-						catch(Exception e)
-						{
-							listener.getLogger().println("Failed to delete.");
-							result = false;
-						}
-					}
-					else
-					{
-						try
-						{
-							result = fp.delete();
-							listener.getLogger().println("Success.");
-						}
-						catch(RuntimeException e)
-						{
-							listener.getLogger().println("Failed to delete.");
-							throw e;
-						}
-						catch(Exception e)
-						{
-							listener.getLogger().println("Failed to delete.");
-							result = false;
-						}
-					}
-					
+						listener.getLogger().println(item.getRemote());
+					}					
 				}
+				fpWS.copyRecursiveTo(resolvedIncludes, resolvedExcludes, fpTL);
+				result = true;
 			}
 			catch(RuntimeException e)
 			{
@@ -145,7 +121,7 @@ public class FileDeleteOperation extends FileOperation implements Serializable {
 		}		
 	}
  @Extension public static class DescriptorImpl extends FileOperationDescriptor {
- public String getDisplayName() { return "File Delete"; }
+ public String getDisplayName() { return "File Copy"; }
 
  }
 }
