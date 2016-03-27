@@ -120,7 +120,7 @@ public class FileTransformOperation extends FileOperation implements Serializabl
 		}		
 	}
  @Extension public static class DescriptorImpl extends FileOperationDescriptor {
- public String getDisplayName() { return "File Copy"; }
+ public String getDisplayName() { return "File Transform"; }
 
  }
 }
