@@ -1,5 +1,6 @@
 package sp.sd.fileoperations;
 
+import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
@@ -27,17 +28,14 @@ import org.jenkinsci.remoting.RoleChecker;
 import org.jenkinsci.remoting.RoleSensitive;
 import java.io.Serializable;
 
-public class FileCopyOperation extends FileOperation implements Serializable { 
+public class FileTransformOperation extends FileOperation implements Serializable { 
 	private final String includes;
 	private final String excludes;
-	private final String targetLocation;
-	private boolean flattenFiles = false;
+	
 	@DataBoundConstructor 
-	 public FileCopyOperation(String includes, String excludes, String targetLocation, boolean flattenFiles) { 
+	 public FileTransformOperation(String includes, String excludes) { 
 		this.includes = includes;
-		this.excludes = excludes;
-		this.targetLocation = targetLocation;
-		this.flattenFiles = flattenFiles;
+		this.excludes = excludes;		
 	 }
 
 	 public String getIncludes()
@@ -48,14 +46,7 @@ public class FileCopyOperation extends FileOperation implements Serializable {
 	 {
 		 return excludes;
 	 }
-	 public String getTargetLocation()
-	 {
-		 return targetLocation;
-	 }
-	 public boolean getFlattenFiles()
-	 {
-		 return flattenFiles;
-	 }
+	 
 	 public boolean RunOperation(AbstractBuild build, Launcher launcher, BuildListener listener) {
 		 boolean result = false;
 		 try
@@ -63,7 +54,7 @@ public class FileCopyOperation extends FileOperation implements Serializable {
 				FilePath ws = build.getWorkspace(); 				
 				
 				try {	
-					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(includes), build.getEnvironment(listener).expand(excludes), build.getEnvironment(listener).expand(targetLocation), flattenFiles));				
+					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(includes), build.getEnvironment(listener).expand(excludes),build.getEnvironment(listener)));				
 				}
 				catch (Exception e) {
 					e.printStackTrace(listener.getLogger());
@@ -81,22 +72,20 @@ public class FileCopyOperation extends FileOperation implements Serializable {
 	private static final class TargetFileCallable implements FileCallable<Boolean> {
 		private static final long serialVersionUID = 1;
 		private final BuildListener listener;
+		private final EnvVars environment;
 		private final String resolvedIncludes;
 		private final String resolvedExcludes;
-		private final String resolvedTargetLocation;
-		private boolean iflattenFiles = false;
-		public TargetFileCallable(BuildListener Listener, String ResolvedIncludes, String ResolvedExcludes, String ResolvedTargetLocation, boolean flattenFiles) {
+		public TargetFileCallable(BuildListener Listener, String ResolvedIncludes, String ResolvedExcludes, EnvVars environment) {
 			this.listener = Listener;
 			this.resolvedIncludes = ResolvedIncludes;	
 			this.resolvedExcludes = ResolvedExcludes;
-			this.resolvedTargetLocation = ResolvedTargetLocation;
-			this.iflattenFiles = flattenFiles;
+			this.environment = environment;
 		}
 		@Override public Boolean invoke(File ws, VirtualChannel channel) {
 			boolean result = false;
-			try {
+			try 
+			{				
 				FilePath fpWS = new FilePath(ws);
-				FilePath fpTL = new FilePath(fpWS, resolvedTargetLocation);
 				FilePath[] resolvedFiles = fpWS.list(resolvedIncludes, resolvedExcludes);
 				if(resolvedFiles.length == 0)
 				{
@@ -107,22 +96,13 @@ public class FileCopyOperation extends FileOperation implements Serializable {
 				{
 					for(FilePath item : resolvedFiles)
 					{
-						listener.getLogger().println(item.getRemote());
+						listener.getLogger().println("Transforming: " + item.getRemote());
+						String fileContent = item.readToString();
+						item.deleteContents();						
+						item.write(environment.expand(fileContent), "UTF-8");
+						result = true;
 					}					
-				}
-				if(iflattenFiles)
-				{
-					for(FilePath item : resolvedFiles)
-					{
-						item.copyTo(new FilePath(fpTL,item.getName()));
-					}
-					result = true;
-				}
-				else
-				{
-					fpWS.copyRecursiveTo(resolvedIncludes, resolvedExcludes, fpTL);
-					result = true;
-				}
+				}				
 			}
 			catch(RuntimeException e)
 			{

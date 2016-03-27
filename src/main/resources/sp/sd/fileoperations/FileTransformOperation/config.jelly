@@ -5,11 +5,5 @@
  </f:entry>
  <f:entry title="Exclude File Pattern">
  <f:textbox field="excludes" />
- </f:entry>
- <f:entry title="Target Location">
- <f:textbox field="targetLocation" />
- </f:entry>
- <f:entry title="Flatten">
- <f:checkbox field="flattenFiles" />
- </f:entry>
+ </f:entry> 
 </j:jelly> 
