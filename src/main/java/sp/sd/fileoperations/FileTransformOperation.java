@@ -51,20 +51,21 @@ public class FileTransformOperation extends FileOperation implements Serializabl
 		 boolean result = false;
 		 try
 			{
+			 	listener.getLogger().println("File Transform Operation:");
 				FilePath ws = build.getWorkspace(); 				
 				
 				try {	
 					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(includes), build.getEnvironment(listener).expand(excludes),build.getEnvironment(listener)));				
 				}
 				catch (Exception e) {
-					e.printStackTrace(listener.getLogger());
+					listener.fatalError(e.getMessage());
 					return false;
 				}
 				
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace(listener.getLogger());
+				listener.fatalError(e.getMessage());
 			}	
 			return result;
 		} 
@@ -106,10 +107,12 @@ public class FileTransformOperation extends FileOperation implements Serializabl
 			}
 			catch(RuntimeException e)
 			{
+				listener.fatalError(e.getMessage());
 				throw e;
 			}
 			catch(Exception e)
 			{
+				listener.fatalError(e.getMessage());
 				result = false;
 			}
 			return result;	

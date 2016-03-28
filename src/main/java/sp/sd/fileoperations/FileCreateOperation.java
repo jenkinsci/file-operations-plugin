@@ -51,20 +51,19 @@ public class FileCreateOperation extends FileOperation implements Serializable {
 		 boolean result = false;
 		 try
 			{
-				FilePath ws = build.getWorkspace(); 				
-				
+			 	listener.getLogger().println("File Create Operation:");
+				FilePath ws = build.getWorkspace(); 
 				try {	
 					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(fileName), build.getEnvironment(listener).expand(fileContent),build.getEnvironment(listener)));				
 				}
 				catch (Exception e) {
-					e.printStackTrace(listener.getLogger());
+					listener.fatalError(e.getMessage());					
 					return false;
 				}
-				
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace(listener.getLogger());
+				listener.fatalError(e.getMessage());
 			}	
 			return result;
 		} 
@@ -87,16 +86,22 @@ public class FileCreateOperation extends FileOperation implements Serializable {
 			{				
 				FilePath fpWS = new FilePath(ws);
 				FilePath fpTL = new FilePath(fpWS, resolvedFileName);
+				if(fpTL.exists())
+				{
+					listener.getLogger().println(resolvedFileName + " file already exists, replacing the content with the provided content.");
+				}
 				listener.getLogger().println("Creating file: " + fpTL.getRemote());
 				fpTL.write(resolvedFileContent, "UTF-8");
 				result = true;
 			}
 			catch(RuntimeException e)
 			{
+				listener.fatalError(e.getMessage());
 				throw e;
 			}
 			catch(Exception e)
 			{
+				listener.fatalError(e.getMessage());
 				result = false;
 			}
 			return result;	

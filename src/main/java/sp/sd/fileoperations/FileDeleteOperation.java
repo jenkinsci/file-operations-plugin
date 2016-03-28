@@ -49,20 +49,21 @@ public class FileDeleteOperation extends FileOperation implements Serializable {
 		 boolean result = false;
 		 try
 			{
+			 	listener.getLogger().println("File Delete Operation:");
 				FilePath ws = build.getWorkspace(); 				
 				
 				try {	
 					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(includes), build.getEnvironment(listener).expand(excludes)));				
 				}
 				catch (Exception e) {
-					e.printStackTrace(listener.getLogger());
+					listener.fatalError(e.getMessage());
 					return false;
 				}
 				
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace(listener.getLogger());
+				listener.fatalError(e.getMessage());
 			}	
 			return result;
 		} 
@@ -99,12 +100,12 @@ public class FileDeleteOperation extends FileOperation implements Serializable {
 						}
 						catch(RuntimeException e)
 						{
-							listener.getLogger().println("Failed to delete.");
+							listener.fatalError(e.getMessage());
 							throw e;
 						}
 						catch(Exception e)
 						{
-							listener.getLogger().println("Failed to delete.");
+							listener.fatalError(e.getMessage());
 							result = false;
 						}
 					}
@@ -117,12 +118,12 @@ public class FileDeleteOperation extends FileOperation implements Serializable {
 						}
 						catch(RuntimeException e)
 						{
-							listener.getLogger().println("Failed to delete.");
+							listener.fatalError(e.getMessage());
 							throw e;
 						}
 						catch(Exception e)
 						{
-							listener.getLogger().println("Failed to delete.");
+							listener.fatalError(e.getMessage());
 							result = false;
 						}
 					}
@@ -131,10 +132,12 @@ public class FileDeleteOperation extends FileOperation implements Serializable {
 			}
 			catch(RuntimeException e)
 			{
+				listener.fatalError(e.getMessage());
 				throw e;
 			}
 			catch(Exception e)
 			{
+				listener.fatalError(e.getMessage());
 				result = false;
 			}
 			return result;	

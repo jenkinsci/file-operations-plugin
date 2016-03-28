@@ -60,20 +60,21 @@ public class FileCopyOperation extends FileOperation implements Serializable {
 		 boolean result = false;
 		 try
 			{
+			 listener.getLogger().println("File Copy Operation:");
 				FilePath ws = build.getWorkspace(); 				
 				
 				try {	
 					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(includes), build.getEnvironment(listener).expand(excludes), build.getEnvironment(listener).expand(targetLocation), flattenFiles));				
 				}
 				catch (Exception e) {
-					e.printStackTrace(listener.getLogger());
+					listener.fatalError(e.getMessage());
 					return false;
 				}
 				
 			}
 			catch(Exception e)
 			{
-				e.printStackTrace(listener.getLogger());
+				listener.fatalError(e.getMessage());
 			}	
 			return result;
 		} 
@@ -126,10 +127,12 @@ public class FileCopyOperation extends FileOperation implements Serializable {
 			}
 			catch(RuntimeException e)
 			{
+				listener.fatalError(e.getMessage());
 				throw e;
 			}
 			catch(Exception e)
 			{
+				listener.fatalError(e.getMessage());
 				result = false;
 			}
 			return result;	
