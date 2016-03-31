@@ -32,13 +32,13 @@ public class FileCreateOperation extends FileOperation implements Serializable {
 		 return fileContent;
 	 }
 	 
-	 public boolean RunOperation(AbstractBuild build, Launcher launcher, BuildListener listener) {
+	 public boolean runOperation(AbstractBuild build, Launcher launcher, BuildListener listener) {
 		 boolean result = false;
 		 try
 			{
-			 	listener.getLogger().println("File Create Operation:");
-				FilePath ws = build.getWorkspace(); 
+			 	listener.getLogger().println("File Create Operation:");				
 				try {	
+					FilePath ws = new FilePath(build.getWorkspace(),"."); 
 					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(fileName), build.getEnvironment(listener).expand(fileContent),build.getEnvironment(listener)));				
 				}
 				catch (Exception e) {

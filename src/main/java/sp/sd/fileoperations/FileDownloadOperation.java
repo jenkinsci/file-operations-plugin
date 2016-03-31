@@ -67,14 +67,13 @@ public class FileDownloadOperation extends FileOperation implements Serializable
 	 {
 		 return password;
 	 }
-	 public boolean RunOperation(AbstractBuild build, Launcher launcher, BuildListener listener) {
+	 public boolean runOperation(AbstractBuild build, Launcher launcher, BuildListener listener) {
 		 boolean result = false;
 		 try
 			{
 			 listener.getLogger().println("File Download Operation:");
-				FilePath ws = build.getWorkspace(); 				
-				
 				try {	
+					FilePath ws = new FilePath(build.getWorkspace(),"."); 
 					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(url), build.getEnvironment(listener).expand(userName), build.getEnvironment(listener).expand(password), build.getEnvironment(listener).expand(targetLocation), build.getEnvironment(listener).expand(targetFileName)));				
 				}
 				catch (Exception e) {

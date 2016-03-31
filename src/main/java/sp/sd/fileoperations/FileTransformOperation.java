@@ -32,14 +32,14 @@ public class FileTransformOperation extends FileOperation implements Serializabl
 		 return excludes;
 	 }
 	 
-	 public boolean RunOperation(AbstractBuild build, Launcher launcher, BuildListener listener) {
+	 public boolean runOperation(AbstractBuild build, Launcher launcher, BuildListener listener) {
 		 boolean result = false;
 		 try
 			{
 			 	listener.getLogger().println("File Transform Operation:");
-				FilePath ws = build.getWorkspace(); 				
 				
 				try {	
+					FilePath ws = new FilePath(build.getWorkspace(),"."); 
 					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(includes), build.getEnvironment(listener).expand(excludes),build.getEnvironment(listener)));				
 				}
 				catch (Exception e) {

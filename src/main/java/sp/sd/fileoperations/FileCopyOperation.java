@@ -41,15 +41,19 @@ public class FileCopyOperation extends FileOperation implements Serializable {
 	 {
 		 return flattenFiles;
 	 }
-	 public boolean RunOperation(AbstractBuild build, Launcher launcher, BuildListener listener) {
+	 public boolean runOperation(AbstractBuild build, Launcher launcher, BuildListener listener) {
 		 boolean result = false;
 		 try
 			{
 			 listener.getLogger().println("File Copy Operation:");
-				FilePath ws = build.getWorkspace(); 				
-				
 				try {	
-					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(includes), build.getEnvironment(listener).expand(excludes), build.getEnvironment(listener).expand(targetLocation), flattenFiles));				
+					FilePath ws = new FilePath(build.getWorkspace(),"."); 
+					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(includes), build.getEnvironment(listener).expand(excludes), build.getEnvironment(listener).expand(targetLocation), flattenFiles));					
+				}
+				catch(RuntimeException e)
+				{
+					listener.getLogger().println(e.getMessage());
+					throw e;
 				}
 				catch (Exception e) {
 					listener.fatalError(e.getMessage());

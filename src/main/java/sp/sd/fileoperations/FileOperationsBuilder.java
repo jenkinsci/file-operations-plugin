@@ -30,7 +30,7 @@ public class FileOperationsBuilder extends Builder {
     public boolean perform(AbstractBuild build, Launcher launcher, BuildListener listener) { 
 		boolean result = false;
 		for (FileOperation item : fileOperations) {						
-			result = item.RunOperation(build,launcher,listener);	
+			result = item.runOperation(build,launcher,listener);	
 			if(!result) break;
 		}		
 		return result;
