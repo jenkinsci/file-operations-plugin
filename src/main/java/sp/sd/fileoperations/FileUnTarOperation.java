@@ -43,7 +43,7 @@ public class FileUnTarOperation extends FileOperation implements Serializable {
 		 boolean result = false;
 		 try
 			{
-			 listener.getLogger().println("Unzip File Operation:");
+			 listener.getLogger().println("Untar File Operation:");
 				try {	
 					FilePath ws = new FilePath(build.getWorkspace(),"."); 
 					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(filePath), build.getEnvironment(listener).expand(targetLocation), isGZIP));					
@@ -85,7 +85,7 @@ public class FileUnTarOperation extends FileOperation implements Serializable {
 				FilePath fpWS = new FilePath(ws);
 				FilePath fpSrcTar = new FilePath(fpWS, resolvedFilePath);
 				FilePath fpTL = new FilePath(fpWS, resolvedTargetLocation);
-				listener.getLogger().println("Unzipping " + resolvedFilePath + " to " + fpTL.getRemote());
+				listener.getLogger().println("Untarring " + resolvedFilePath + " to " + fpTL.getRemote());
 				if(!fpTL.exists())
 				{
 					fpTL.mkdirs();					
@@ -94,13 +94,13 @@ public class FileUnTarOperation extends FileOperation implements Serializable {
 				{
 					fpSrcTar.untar(fpTL, FilePath.TarCompression.GZIP);
 					result = true;
-					listener.getLogger().println("Unzip completed.");
+					listener.getLogger().println("Untar completed.");
 				}
 				else
 				{
 					fpSrcTar.untar(fpTL, FilePath.TarCompression.NONE);
 					result = true;
-					listener.getLogger().println("Unzip completed.");
+					listener.getLogger().println("Untar completed.");
 				}
 				
 			}
@@ -122,7 +122,7 @@ public class FileUnTarOperation extends FileOperation implements Serializable {
 		}		
 	}
  @Extension public static class DescriptorImpl extends FileOperationDescriptor {
- public String getDisplayName() { return "Unzip"; }
+ public String getDisplayName() { return "Untar"; }
 
  }
 }
