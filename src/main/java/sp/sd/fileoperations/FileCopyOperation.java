@@ -1,10 +1,14 @@
 package sp.sd.fileoperations;
 
+import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.BuildListener;
+import hudson.model.TaskListener;
 import hudson.model.AbstractBuild;
+import hudson.model.Run;
+
 import org.kohsuke.stapler.DataBoundConstructor;
 import java.io.File;
 import hudson.FilePath.FileCallable;
@@ -41,14 +45,15 @@ public class FileCopyOperation extends FileOperation implements Serializable {
 	 {
 		 return flattenFiles;
 	 }
-	 public boolean runOperation(AbstractBuild build, Launcher launcher, BuildListener listener) {
+	 public boolean runOperation(Run<?, ?> run, FilePath buildWorkspace, Launcher launcher, TaskListener listener) {
 		 boolean result = false;
 		 try
 			{
 			 listener.getLogger().println("File Copy Operation:");
+			 EnvVars envVars = run.getEnvironment(listener);
 				try {	
-					FilePath ws = new FilePath(build.getWorkspace(),"."); 
-					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(includes), build.getEnvironment(listener).expand(excludes), build.getEnvironment(listener).expand(targetLocation), flattenFiles));					
+					FilePath ws = new FilePath(buildWorkspace,"."); 
+					result = ws.act(new TargetFileCallable(listener, envVars.expand(includes), envVars.expand(excludes), envVars.expand(targetLocation), flattenFiles));					
 				}
 				catch(RuntimeException e)
 				{
@@ -70,12 +75,12 @@ public class FileCopyOperation extends FileOperation implements Serializable {
  
 	private static final class TargetFileCallable implements FileCallable<Boolean> {
 		private static final long serialVersionUID = 1;
-		private final BuildListener listener;
+		private final TaskListener listener;
 		private final String resolvedIncludes;
 		private final String resolvedExcludes;
 		private final String resolvedTargetLocation;
 		private boolean iflattenFiles = false;
-		public TargetFileCallable(BuildListener Listener, String ResolvedIncludes, String ResolvedExcludes, String ResolvedTargetLocation, boolean flattenFiles) {
+		public TargetFileCallable(TaskListener Listener, String ResolvedIncludes, String ResolvedExcludes, String ResolvedTargetLocation, boolean flattenFiles) {
 			this.listener = Listener;
 			this.resolvedIncludes = ResolvedIncludes;	
 			this.resolvedExcludes = ResolvedExcludes;

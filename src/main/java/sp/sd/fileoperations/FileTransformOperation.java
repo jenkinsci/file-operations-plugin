@@ -6,6 +6,9 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
+import hudson.model.Run;
+import hudson.model.TaskListener;
+
 import org.kohsuke.stapler.DataBoundConstructor;
 import java.io.File;
 import hudson.FilePath.FileCallable;
@@ -32,15 +35,15 @@ public class FileTransformOperation extends FileOperation implements Serializabl
 		 return excludes;
 	 }
 	 
-	 public boolean runOperation(AbstractBuild build, Launcher launcher, BuildListener listener) {
+	 public boolean runOperation(Run<?, ?> run, FilePath buildWorkspace, Launcher launcher, TaskListener listener) {
 		 boolean result = false;
 		 try
 			{
 			 	listener.getLogger().println("File Transform Operation:");
-				
+			 	EnvVars envVars = run.getEnvironment(listener);
 				try {	
-					FilePath ws = new FilePath(build.getWorkspace(),"."); 
-					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(includes), build.getEnvironment(listener).expand(excludes),build.getEnvironment(listener)));				
+					FilePath ws = new FilePath(buildWorkspace,"."); 
+					result = ws.act(new TargetFileCallable(listener, envVars.expand(includes), envVars.expand(excludes),envVars));				
 				}
 				catch (Exception e) {
 					listener.fatalError(e.getMessage());
@@ -57,11 +60,11 @@ public class FileTransformOperation extends FileOperation implements Serializabl
  
 	private static final class TargetFileCallable implements FileCallable<Boolean> {
 		private static final long serialVersionUID = 1;
-		private final BuildListener listener;
+		private final TaskListener listener;
 		private final EnvVars environment;
 		private final String resolvedIncludes;
 		private final String resolvedExcludes;
-		public TargetFileCallable(BuildListener Listener, String ResolvedIncludes, String ResolvedExcludes, EnvVars environment) {
+		public TargetFileCallable(TaskListener Listener, String ResolvedIncludes, String ResolvedExcludes, EnvVars environment) {
 			this.listener = Listener;
 			this.resolvedIncludes = ResolvedIncludes;	
 			this.resolvedExcludes = ResolvedExcludes;

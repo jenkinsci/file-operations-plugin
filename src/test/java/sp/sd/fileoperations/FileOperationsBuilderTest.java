@@ -42,6 +42,6 @@ public class FileOperationsBuilderTest {
         FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
         p1.getBuildersList().add(new FileOperationsBuilder(null));        
         FreeStyleBuild build = p1.scheduleBuild2(0).get();
-        assertEquals(Result.FAILURE, build.getResult());
+        assertEquals(Result.SUCCESS, build.getResult());
     }
 }

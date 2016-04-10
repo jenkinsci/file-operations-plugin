@@ -1,10 +1,14 @@
 package sp.sd.fileoperations;
 
+import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.BuildListener;
 import hudson.model.AbstractBuild;
+import hudson.model.Run;
+import hudson.model.TaskListener;
+
 import org.kohsuke.stapler.DataBoundConstructor;
 import java.io.File;
 import hudson.FilePath.FileCallable;
@@ -39,14 +43,15 @@ public class FileUnTarOperation extends FileOperation implements Serializable {
 		 return isGZIP;
 	 }
 	 
-	 public boolean runOperation(AbstractBuild build, Launcher launcher, BuildListener listener) {
+	 public boolean runOperation(Run<?, ?> run, FilePath buildWorkspace, Launcher launcher, TaskListener listener) {
 		 boolean result = false;
 		 try
 			{
 			 listener.getLogger().println("Untar File Operation:");
+			 EnvVars envVars = run.getEnvironment(listener);
 				try {	
-					FilePath ws = new FilePath(build.getWorkspace(),"."); 
-					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(filePath), build.getEnvironment(listener).expand(targetLocation), isGZIP));					
+					FilePath ws = new FilePath(buildWorkspace,"."); 
+					result = ws.act(new TargetFileCallable(listener, envVars.expand(filePath), envVars.expand(targetLocation), isGZIP));					
 				}
 				catch(RuntimeException e)
 				{
@@ -68,12 +73,12 @@ public class FileUnTarOperation extends FileOperation implements Serializable {
  
 	private static final class TargetFileCallable implements FileCallable<Boolean> {
 		private static final long serialVersionUID = 1;
-		private final BuildListener listener;
+		private final TaskListener listener;
 		private final String resolvedFilePath;		
 		private final String resolvedTargetLocation;
 		private boolean IsGZIP = false;
 		
-		public TargetFileCallable(BuildListener Listener, String ResolvedFilePath, String ResolvedTargetLocation, boolean IsGZIP) {
+		public TargetFileCallable(TaskListener Listener, String ResolvedFilePath, String ResolvedTargetLocation, boolean IsGZIP) {
 			this.listener = Listener;
 			this.resolvedFilePath = ResolvedFilePath;
 			this.resolvedTargetLocation = ResolvedTargetLocation;

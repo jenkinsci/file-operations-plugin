@@ -6,6 +6,9 @@ import hudson.Extension;
 import hudson.FilePath;
 import hudson.model.AbstractBuild;
 import hudson.model.BuildListener;
+import hudson.model.Run;
+import hudson.model.TaskListener;
+
 import org.kohsuke.stapler.DataBoundConstructor;
 import java.io.File;
 import hudson.FilePath.FileCallable;
@@ -32,14 +35,15 @@ public class FileCreateOperation extends FileOperation implements Serializable {
 		 return fileContent;
 	 }
 	 
-	 public boolean runOperation(AbstractBuild build, Launcher launcher, BuildListener listener) {
+	 public boolean runOperation(Run<?, ?> run, FilePath buildWorkspace, Launcher launcher, TaskListener listener) {
 		 boolean result = false;
 		 try
 			{
-			 	listener.getLogger().println("File Create Operation:");				
+			 	listener.getLogger().println("File Create Operation:");	
+			 	EnvVars envVars = run.getEnvironment(listener);
 				try {	
-					FilePath ws = new FilePath(build.getWorkspace(),"."); 
-					result = ws.act(new TargetFileCallable(listener, build.getEnvironment(listener).expand(fileName), build.getEnvironment(listener).expand(fileContent),build.getEnvironment(listener)));				
+					FilePath ws = new FilePath(buildWorkspace,"."); 
+					result = ws.act(new TargetFileCallable(listener, envVars.expand(fileName), envVars.expand(fileContent),envVars));				
 				}
 				catch (Exception e) {
 					listener.fatalError(e.getMessage());					
@@ -55,11 +59,11 @@ public class FileCreateOperation extends FileOperation implements Serializable {
  
 	private static final class TargetFileCallable implements FileCallable<Boolean> {
 		private static final long serialVersionUID = 1;
-		private final BuildListener listener;
+		private final TaskListener listener;
 		private final EnvVars environment;
 		private final String resolvedFileName;
 		private final String resolvedFileContent;
-		public TargetFileCallable(BuildListener Listener, String ResolvedFileName, String ResolvedFileContent, EnvVars environment) {
+		public TargetFileCallable(TaskListener Listener, String ResolvedFileName, String ResolvedFileContent, EnvVars environment) {
 			this.listener = Listener;
 			this.resolvedFileName = ResolvedFileName;	
 			this.resolvedFileContent = ResolvedFileContent;
