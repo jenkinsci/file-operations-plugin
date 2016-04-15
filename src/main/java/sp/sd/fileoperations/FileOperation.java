@@ -9,5 +9,5 @@ import hudson.model.TaskListener;
 import hudson.model.Run;
 
 public abstract class FileOperation extends AbstractDescribableImpl<FileOperation> {
-	public abstract boolean runOperation(Run<?, ?> run, FilePath buildWorkspace, Launcher launcher, TaskListener listener);  
+    public abstract boolean runOperation(Run<?, ?> run, FilePath buildWorkspace, Launcher launcher, TaskListener listener);
 }
