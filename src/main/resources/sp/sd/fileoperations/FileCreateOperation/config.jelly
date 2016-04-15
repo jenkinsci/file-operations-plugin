@@ -1,9 +1,9 @@
 <?jelly escape-by-default='true'?> 
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form">
-    <f:entry title="File Path">
+    <f:entry title="File Path" field="fileName">
         <f:textbox field="fileName" />
     </f:entry>
-    <f:entry title="Text File Content">
+    <f:entry title="Text File Content" field="fileContent">
         <f:textarea field="fileContent" />
     </f:entry>
 </j:jelly> 

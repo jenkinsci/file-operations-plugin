@@ -1,18 +1,18 @@
 <?jelly escape-by-default='true'?> 
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form">
-    <f:entry title="Url">
+    <f:entry title="Url" field="url">
         <f:textbox field="url" />
     </f:entry>
-    <f:entry title="User Name">
+    <f:entry title="User Name" field="userName">
         <f:textbox field="userName" />
     </f:entry>
-    <f:entry title="Password">
+    <f:entry title="Password" field="password">
         <f:password field="password" />
     </f:entry>
-    <f:entry title="Target Location">
+    <f:entry title="Target Location" field="targetLocation">
         <f:textbox field="targetLocation" />
     </f:entry>
-    <f:entry title="Target File Name">
+    <f:entry title="Target File Name" field="targetFileName">
         <f:textbox field="targetFileName" />
     </f:entry>
 </j:jelly> 
