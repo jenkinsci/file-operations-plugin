@@ -42,8 +42,7 @@ public class FileOperationsBuilder extends Builder implements SimpleBuildStep {
             listener.getLogger().println("No File Operation added.");
             result = true;
         }
-        if(!result)
-        {
+        if (!result) {
             build.setResult(Result.FAILURE);
         }
     }

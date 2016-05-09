@@ -1,75 +1,76 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
-  <modelVersion>4.0.0</modelVersion>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-  <parent>
-    <groupId>org.jenkins-ci.plugins</groupId>
-    <artifactId>plugin</artifactId>
-    <version>2.3</version>
-    <relativePath />
-  </parent>
-  <groupId>sp.sd</groupId>
-  <artifactId>file-operations</artifactId>
-  <version>1.1-SNAPSHOT</version>
-  <packaging>hpi</packaging>
+    <parent>
+        <groupId>org.jenkins-ci.plugins</groupId>
+        <artifactId>plugin</artifactId>
+        <version>2.3</version>
+        <relativePath/>
+    </parent>
+    <groupId>sp.sd</groupId>
+    <artifactId>file-operations</artifactId>
+    <version>1.1-SNAPSHOT</version>
+    <packaging>hpi</packaging>
 
-  <properties>   
-    <jenkins.version>1.625.3</jenkins.version>   
-    <java.level>7</java.level>   
-    <jenkins-test-harness.version>2.1</jenkins-test-harness.version>   
-  </properties>
+    <properties>
+        <jenkins.version>1.625.3</jenkins.version>
+        <java.level>7</java.level>
+        <jenkins-test-harness.version>2.1</jenkins-test-harness.version>
+    </properties>
 
-  <name>File Operations Plugin</name>
-  <url>https://wiki.jenkins-ci.org/display/JENKINS/File+Operations+Plugin</url> 
+    <name>File Operations Plugin</name>
+    <url>https://wiki.jenkins-ci.org/display/JENKINS/File+Operations+Plugin</url>
 
-  <licenses>
-    <license>
-      <name>MIT License</name>
-      <url>http://opensource.org/licenses/MIT</url>
-    </license>
-  </licenses>
+    <licenses>
+        <license>
+            <name>MIT License</name>
+            <url>http://opensource.org/licenses/MIT</url>
+        </license>
+    </licenses>
 
-  <developers>
-    <developer>
-      <id>pskumar448</id>
-      <name>Suresh Kumar</name>
-      <email>pskumar448@gmail.com</email>
-    </developer>
-  </developers> 
- 
-  <scm>
-    <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
-    <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
-    <url>http://github.com/jenkinsci/${project.artifactId}-plugin</url>
-    <tag>HEAD</tag>
-  </scm>
- 
-  <repositories>
-    <repository>
-      <id>repo.jenkins-ci.org</id>
-      <url>http://repo.jenkins-ci.org/public/</url>
-    </repository>
-  </repositories>
-  <pluginRepositories>
-    <pluginRepository>
-      <id>repo.jenkins-ci.org</id>
-      <url>http://repo.jenkins-ci.org/public/</url>
-    </pluginRepository>
-  </pluginRepositories>
-  <dependencies>
-   <dependency>
-	<groupId>org.apache.httpcomponents</groupId>
-	<artifactId>httpclient</artifactId>
-	<version>4.5.2</version>
-	</dependency>
-	
-		<dependency>
-			<groupId>org.mockito</groupId>
-			<artifactId>mockito-all</artifactId>
-			<version>1.10.19</version>
-			<scope>test</scope>
-		</dependency>
-		<dependency>
+    <developers>
+        <developer>
+            <id>pskumar448</id>
+            <name>Suresh Kumar</name>
+            <email>pskumar448@gmail.com</email>
+        </developer>
+    </developers>
+
+    <scm>
+        <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
+        <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
+        <url>http://github.com/jenkinsci/${project.artifactId}-plugin</url>
+        <tag>HEAD</tag>
+    </scm>
+
+    <repositories>
+        <repository>
+            <id>repo.jenkins-ci.org</id>
+            <url>http://repo.jenkins-ci.org/public/</url>
+        </repository>
+    </repositories>
+    <pluginRepositories>
+        <pluginRepository>
+            <id>repo.jenkins-ci.org</id>
+            <url>http://repo.jenkins-ci.org/public/</url>
+        </pluginRepository>
+    </pluginRepositories>
+    <dependencies>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+            <version>4.5.2</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-all</artifactId>
+            <version>1.10.19</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>1.8.3</version>
@@ -97,6 +98,6 @@
             <artifactId>commons-logging</artifactId>
             <scope>test</scope>
         </dependency>
-  </dependencies>
-  <description>File Operations Plugin</description>
+    </dependencies>
+    <description>File Operations Plugin</description>
 </project>
