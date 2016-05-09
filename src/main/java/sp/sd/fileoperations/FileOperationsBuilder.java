@@ -3,10 +3,7 @@ package sp.sd.fileoperations;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Extension;
-import hudson.model.AbstractBuild;
-import hudson.model.AbstractProject;
-import hudson.model.BuildListener;
-import hudson.model.TaskListener;
+import hudson.model.*;
 import hudson.tasks.Builder;
 import hudson.tasks.BuildStepDescriptor;
 import org.kohsuke.stapler.DataBoundConstructor;
@@ -19,10 +16,7 @@ import jenkins.tasks.SimpleBuildStep;
 
 import java.util.Collections;
 
-import hudson.model.Descriptor;
-import hudson.model.Run;
-
-public class FileOperationsBuilder extends Builder {
+public class FileOperationsBuilder extends Builder implements SimpleBuildStep {
 
     private final List<FileOperation> fileOperations;
 
@@ -37,18 +31,21 @@ public class FileOperationsBuilder extends Builder {
     }
 
     @Override
-    public boolean perform(AbstractBuild<?, ?> build, Launcher launcher, BuildListener listener) {
+    public void perform(Run build, FilePath workspace, Launcher launcher, TaskListener listener) {
         boolean result = false;
         if (fileOperations.size() > 0) {
             for (FileOperation item : fileOperations) {
-                result = item.runOperation(build, build.getWorkspace(), launcher, listener);
+                result = item.runOperation(build, workspace, launcher, listener);
                 if (!result) break;
             }
         } else {
             listener.getLogger().println("No File Operation added.");
             result = true;
         }
-        return result;
+        if(!result)
+        {
+            build.setResult(Result.FAILURE);
+        }
     }
 
 
