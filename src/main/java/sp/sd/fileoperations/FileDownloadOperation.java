@@ -9,6 +9,7 @@ import hudson.model.BuildListener;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 
+import hudson.util.Secret;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.FileOutputStream;
@@ -52,7 +53,7 @@ public class FileDownloadOperation extends FileOperation implements Serializable
         this.userName = userName;
         this.targetLocation = targetLocation;
         this.targetFileName = targetFileName;
-        this.password = password;
+        this.password = Secret.fromString(password).getEncryptedValue();
     }
 
     public String getUrl() {
@@ -72,7 +73,7 @@ public class FileDownloadOperation extends FileOperation implements Serializable
     }
 
     public String getPassword() {
-        return password;
+        return Secret.decrypt(password).getPlainText();
     }
 
     public boolean runOperation(Run<?, ?> run, FilePath buildWorkspace, Launcher launcher, TaskListener listener) {
@@ -82,7 +83,7 @@ public class FileDownloadOperation extends FileOperation implements Serializable
             EnvVars envVars = run.getEnvironment(listener);
             try {
                 FilePath ws = new FilePath(buildWorkspace, ".");
-                result = ws.act(new TargetFileCallable(listener, envVars.expand(url), envVars.expand(userName), envVars.expand(password), envVars.expand(targetLocation), envVars.expand(targetFileName)));
+                result = ws.act(new TargetFileCallable(listener, envVars.expand(url), envVars.expand(userName), envVars.expand(Secret.decrypt(password).getPlainText()), envVars.expand(targetLocation), envVars.expand(targetFileName)));
             } catch (Exception e) {
                 listener.fatalError(e.getMessage());
                 return false;
