@@ -1,39 +1,18 @@
-File Operations Plugin
-=====================
-This plugin's main goal is to provide File Operations as Build Step.
+package sp.sd.fileoperations.dsl;
 
-At present following Operations implemented:
----
-  1) File Copy Operation
-  
-  2) File Delete Operation
-  
-  3) File Create Operation
-  
-  4) File Download Operation
-  
-  5) File Transform Operation
-  
-  6) File UnTar Operation
-  
-  7) File UnZip Operation
-  
-  8) Folder Create Operation
-  
-  9) Folder Copy Operation
-  
-  10) Folder Delete Operation
-  
-  11) File Join
-  
-  12) File Properties To Json
+/**
+ * Created by suresh on 10/3/2016.
+ */
 
-This is will be helpful for doing cross platform file operations. 
-No need to search for Nix or Win commands to do file operations.
+import hudson.Extension;
+import javaposse.jobdsl.dsl.RequiresPlugin;
+import javaposse.jobdsl.dsl.helpers.step.StepContext;
+import javaposse.jobdsl.plugin.ContextExtensionPoint;
+import javaposse.jobdsl.plugin.DslExtensionMethod;
+import sp.sd.fileoperations.FileOperationsBuilder;
 
-Job DSL Details:
-----------------
-```
+/*
+ ```
  job {
     steps {
         fileOperations {
@@ -75,3 +54,15 @@ Job DSL Details:
         }
     }
  ```
+*/
+
+@Extension(optional = true)
+public class FileOperationsJobDslExtension extends ContextExtensionPoint {
+    @RequiresPlugin(id = "file-operations", minimumVersion = "1.2")
+    @DslExtensionMethod(context = StepContext.class)
+    public Object fileOperations(Runnable closure) {
+        FileOperationsJobDslContext context = new FileOperationsJobDslContext();
+        executeInContext(closure, context);
+        return new FileOperationsBuilder(context.fileOperations);
+    }
+}
