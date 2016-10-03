@@ -1,5 +1,6 @@
 package sp.sd.fileoperations;
 
+import hudson.AbortException;
 import hudson.FilePath;
 import hudson.Launcher;
 import hudson.Extension;
@@ -31,7 +32,7 @@ public class FileOperationsBuilder extends Builder implements SimpleBuildStep {
     }
 
     @Override
-    public void perform(Run build, FilePath workspace, Launcher launcher, TaskListener listener) {
+    public void perform(Run build, FilePath workspace, Launcher launcher, TaskListener listener) throws AbortException {
         boolean result = false;
         if (fileOperations.size() > 0) {
             for (FileOperation item : fileOperations) {
@@ -43,7 +44,7 @@ public class FileOperationsBuilder extends Builder implements SimpleBuildStep {
             result = true;
         }
         if (!result) {
-            build.setResult(Result.FAILURE);
+            throw new AbortException("File Operations failed.");
         }
     }
 
