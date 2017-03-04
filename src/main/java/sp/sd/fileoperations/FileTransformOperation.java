@@ -9,6 +9,7 @@ import hudson.model.BuildListener;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.File;
@@ -105,6 +106,7 @@ public class FileTransformOperation extends FileOperation implements Serializabl
     }
 
     @Extension
+    @Symbol("fileTransformOperation")
     public static class DescriptorImpl extends FileOperationDescriptor {
         public String getDisplayName() {
             return "File Transform";

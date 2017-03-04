@@ -10,6 +10,7 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 
 import hudson.util.Secret;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.FileOutputStream;
@@ -164,6 +165,7 @@ public class FileDownloadOperation extends FileOperation implements Serializable
     }
 
     @Extension
+    @Symbol("fileDownloadOperation")
     public static class DescriptorImpl extends FileOperationDescriptor {
         public String getDisplayName() {
             return "File Download";

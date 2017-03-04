@@ -7,6 +7,7 @@ import hudson.Extension;
 import hudson.model.*;
 import hudson.tasks.Builder;
 import hudson.tasks.BuildStepDescriptor;
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.util.List;
@@ -56,7 +57,12 @@ public class FileOperationsBuilder extends Builder implements SimpleBuildStep {
 
 
     @Extension
+    @Symbol("fileOperations")
     public static final class DescriptorImpl extends BuildStepDescriptor<Builder> {
+
+        public DescriptorImpl() {
+            load();
+        }
 
         public boolean isApplicable(Class<? extends AbstractProject> aClass) {
             // Indicates that this builder can be used with all kinds of project types 

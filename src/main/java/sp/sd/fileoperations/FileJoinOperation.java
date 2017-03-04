@@ -9,6 +9,7 @@ import hudson.model.BuildListener;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.File;
@@ -110,6 +111,7 @@ public class FileJoinOperation extends FileOperation implements Serializable {
     }
 
     @Extension
+    @Symbol("fileJoinOperation")
     public static class DescriptorImpl extends FileOperationDescriptor {
         public String getDisplayName() {
             return "File Join";
