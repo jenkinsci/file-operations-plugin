@@ -9,6 +9,7 @@ import hudson.model.AbstractBuild;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.File;
@@ -117,6 +118,7 @@ public class FileUnTarOperation extends FileOperation implements Serializable {
     }
 
     @Extension
+    @Symbol("fileUnTarOperation")
     public static class DescriptorImpl extends FileOperationDescriptor {
         public String getDisplayName() {
             return "Untar";

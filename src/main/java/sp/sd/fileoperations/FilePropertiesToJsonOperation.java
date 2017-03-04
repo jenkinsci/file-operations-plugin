@@ -11,6 +11,7 @@ import hudson.model.BuildListener;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.File;
@@ -127,6 +128,7 @@ public class FilePropertiesToJsonOperation extends FileOperation implements Seri
     }
 
     @Extension
+    @Symbol("filePropertiesToJsonOperation")
     public static class DescriptorImpl extends FileOperationDescriptor {
         public String getDisplayName() {
             return "File Properties to Json";

@@ -9,6 +9,7 @@ import hudson.model.BuildListener;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 
+import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.File;
@@ -123,6 +124,7 @@ public class FileDeleteOperation extends FileOperation implements Serializable {
     }
 
     @Extension
+    @Symbol("fileDeleteOperation")
     public static class DescriptorImpl extends FileOperationDescriptor {
         public String getDisplayName() {
             return "File Delete";
