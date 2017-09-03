@@ -27,6 +27,10 @@ At present following Operations implemented:
   11) File Join
   
   12) File Properties To Json
+  
+  13) File Rename Operation
+  
+  14) Folder Rename Operation
 
 This is will be helpful for doing cross platform file operations. 
 No need to search for Nix or Win commands to do file operations.
@@ -49,6 +53,8 @@ Job DSL Details:
             folderCopyOperation(String sourceFolderPath, String destinationFolderPath)
             folderCreateOperation(String folderPath)
             folderDeleteOperation(String folderPath)
+            fileRenameOperation(String source, String destination)
+            folderRenameOperation(String source, String destination)
         }
     }
  }
@@ -71,6 +77,8 @@ Job DSL Details:
             folderCopyOperation('sourcefolder','destinationfolder')
             folderCreateOperation('newfolder')
             folderDeleteOperation('targetfolder')
+            fileRenameOperation('test.txt', 'testrename.txt')
+            folderRenameOperation('test', 'testrename')
           }
         }
     }

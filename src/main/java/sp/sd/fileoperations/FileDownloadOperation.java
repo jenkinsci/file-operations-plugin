@@ -4,8 +4,6 @@ import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
-import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 
@@ -133,7 +131,7 @@ public class FileDownloadOperation extends FileOperation implements Serializable
                 CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setRedirectStrategy(new LaxRedirectStrategy()).build();
                 HttpGet httpGet = new HttpGet(Url);
                 HttpClientContext localContext = HttpClientContext.create();
-                if(resolvedUserName != "" && resolvedPassword != "") {
+                if (resolvedUserName != "" && resolvedPassword != "") {
                     localContext.setAuthCache(authCache);
                 }
                 HttpResponse response = httpClient.execute(host, httpGet, localContext);
