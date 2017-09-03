@@ -72,4 +72,14 @@ public class FileOperationsJobDslContext implements Context {
         FolderDeleteOperation folderDeleteOperation = new FolderDeleteOperation(folderPath);
         fileOperations.add(folderDeleteOperation);
     }
+
+    public void fileRenameOperation(String source, String destination) {
+        FileRenameOperation fileRenameOperation = new FileRenameOperation(source, destination);
+        fileOperations.add(fileRenameOperation);
+    }
+
+    public void folderRenameOperation(String source, String destination) {
+        FolderRenameOperation folderRenameOperation = new FolderRenameOperation(source, destination);
+        fileOperations.add(folderRenameOperation);
+    }
 }
