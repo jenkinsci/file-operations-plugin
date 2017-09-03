@@ -1,47 +1,54 @@
 package sp.sd.fileoperations;
 
 import hudson.EnvVars;
-import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.FilePath.FileCallable;
+import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-
+import hudson.remoting.VirtualChannel;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.File;
-
-import hudson.FilePath.FileCallable;
-import hudson.remoting.VirtualChannel;
-import org.jenkinsci.remoting.RoleChecker;
-
 import java.io.Serializable;
 
-public class FolderDeleteOperation extends FileOperation implements Serializable {
-    private final String folderPath;
+public class FileRenameOperation extends FileOperation implements Serializable {
+    private final String source;
+    private final String destination;
 
     @DataBoundConstructor
-    public FolderDeleteOperation(String folderPath) {
-        this.folderPath = folderPath;
+    public FileRenameOperation(String source, String destination) {
+        this.source = source;
+        this.destination = destination;
     }
 
-    public String getFolderPath() {
-        return folderPath;
+    public String getSource() {
+        return source;
+    }
+
+    public String getDestination() {
+        return destination;
     }
 
     public boolean runOperation(Run<?, ?> run, FilePath buildWorkspace, Launcher launcher, TaskListener listener) {
         boolean result = false;
         try {
-            listener.getLogger().println("Folder Delete Operation:");
+            listener.getLogger().println("File Rename Operation:");
             EnvVars envVars = run.getEnvironment(listener);
             try {
                 FilePath ws = new FilePath(buildWorkspace, ".");
-                result = ws.act(new TargetFileCallable(listener, envVars.expand(folderPath), envVars));
+                result = ws.act(new TargetFileCallable(listener, envVars.expand(source), envVars.expand(destination)));
+            } catch (RuntimeException e) {
+                listener.getLogger().println(e.getMessage());
+                throw e;
             } catch (Exception e) {
                 listener.fatalError(e.getMessage());
                 return false;
             }
+
         } catch (Exception e) {
             listener.fatalError(e.getMessage());
         }
@@ -51,13 +58,13 @@ public class FolderDeleteOperation extends FileOperation implements Serializable
     private static final class TargetFileCallable implements FileCallable<Boolean> {
         private static final long serialVersionUID = 1;
         private final TaskListener listener;
-        private final EnvVars environment;
-        private final String resolvedFolderPath;
+        private final String resolvedSource;
+        private final String resolvedDestination;
 
-        public TargetFileCallable(TaskListener Listener, String ResolvedFolderPath, EnvVars environment) {
+        public TargetFileCallable(TaskListener Listener, String ResolvedSource, String ResolvedDestination) {
             this.listener = Listener;
-            this.resolvedFolderPath = ResolvedFolderPath;
-            this.environment = environment;
+            this.resolvedSource = ResolvedSource;
+            this.resolvedDestination = ResolvedDestination;
         }
 
         @Override
@@ -65,10 +72,15 @@ public class FolderDeleteOperation extends FileOperation implements Serializable
             boolean result = false;
             try {
                 FilePath fpWS = new FilePath(ws);
-                FilePath fpTL = new FilePath(fpWS, resolvedFolderPath);
-                listener.getLogger().println("Deleting folder: " + fpTL.getRemote());
-                fpTL.deleteRecursive();
-                result = true;
+                FilePath fpSL = new FilePath(fpWS, resolvedSource);
+                if(fpSL.exists()) {
+                    FilePath fpDL = new FilePath(fpWS, resolvedDestination);
+                    fpSL.renameTo(fpDL);
+                    result = true;
+                }
+                else {
+                    listener.fatalError("The source file"+ fpSL.getRemote()  +" doesn't exist.");
+                }
             } catch (RuntimeException e) {
                 listener.fatalError(e.getMessage());
                 throw e;
@@ -86,10 +98,10 @@ public class FolderDeleteOperation extends FileOperation implements Serializable
     }
 
     @Extension
-    @Symbol("folderDeleteOperation")
+    @Symbol("fileRenameOperation")
     public static class DescriptorImpl extends FileOperationDescriptor {
         public String getDisplayName() {
-            return "Folder Delete";
+            return "File Rename";
         }
 
     }

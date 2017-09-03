@@ -2,8 +2,6 @@ package sp.sd.fileoperations;
 
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.model.AbstractBuild;
-import hudson.model.BuildListener;
 import hudson.model.AbstractDescribableImpl;
 import hudson.model.TaskListener;
 import hudson.model.Run;

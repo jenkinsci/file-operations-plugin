@@ -4,9 +4,7 @@ import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
-import hudson.model.BuildListener;
 import hudson.model.TaskListener;
-import hudson.model.AbstractBuild;
 import hudson.model.Run;
 
 import org.jenkinsci.Symbol;

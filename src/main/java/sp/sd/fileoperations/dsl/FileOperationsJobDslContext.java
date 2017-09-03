@@ -1,11 +1,21 @@
 package sp.sd.fileoperations.dsl;
 
-/**
- * Created by suresh on 10/3/2016.
- */
-
 import javaposse.jobdsl.dsl.Context;
-import sp.sd.fileoperations.*;
+import sp.sd.fileoperations.FileCopyOperation;
+import sp.sd.fileoperations.FileCreateOperation;
+import sp.sd.fileoperations.FileDeleteOperation;
+import sp.sd.fileoperations.FileDownloadOperation;
+import sp.sd.fileoperations.FileJoinOperation;
+import sp.sd.fileoperations.FileOperation;
+import sp.sd.fileoperations.FilePropertiesToJsonOperation;
+import sp.sd.fileoperations.FileRenameOperation;
+import sp.sd.fileoperations.FileTransformOperation;
+import sp.sd.fileoperations.FileUnTarOperation;
+import sp.sd.fileoperations.FileUnZipOperation;
+import sp.sd.fileoperations.FolderCopyOperation;
+import sp.sd.fileoperations.FolderCreateOperation;
+import sp.sd.fileoperations.FolderDeleteOperation;
+import sp.sd.fileoperations.FolderRenameOperation;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,5 +81,15 @@ public class FileOperationsJobDslContext implements Context {
     public void folderDeleteOperation(String folderPath) {
         FolderDeleteOperation folderDeleteOperation = new FolderDeleteOperation(folderPath);
         fileOperations.add(folderDeleteOperation);
+    }
+
+    public void fileRenameOperation(String source, String destination) {
+        FileRenameOperation fileRenameOperation = new FileRenameOperation(source, destination);
+        fileOperations.add(fileRenameOperation);
+    }
+
+    public void folderRenameOperation(String source, String destination) {
+        FolderRenameOperation folderRenameOperation = new FolderRenameOperation(source, destination);
+        fileOperations.add(folderRenameOperation);
     }
 }

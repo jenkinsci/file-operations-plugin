@@ -4,8 +4,6 @@ import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
-import hudson.model.BuildListener;
-import hudson.model.AbstractBuild;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 
@@ -82,7 +80,6 @@ public class FileUnZipOperation extends FileOperation implements Serializable {
                 listener.getLogger().println("Unzipping " + resolvedFilePath + " to " + fpTL.getRemote());
                 if (!fpTL.exists()) {
                     fpTL.mkdirs();
-                    //fpTL.chmod(0644);
                 }
                 fpSrcZip.unzip(fpTL);
                 result = true;
