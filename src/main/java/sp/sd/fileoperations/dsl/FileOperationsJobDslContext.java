@@ -12,6 +12,7 @@ import sp.sd.fileoperations.FileRenameOperation;
 import sp.sd.fileoperations.FileTransformOperation;
 import sp.sd.fileoperations.FileUnTarOperation;
 import sp.sd.fileoperations.FileUnZipOperation;
+import sp.sd.fileoperations.FileZipOperation;
 import sp.sd.fileoperations.FolderCopyOperation;
 import sp.sd.fileoperations.FolderCreateOperation;
 import sp.sd.fileoperations.FolderDeleteOperation;
@@ -66,6 +67,11 @@ public class FileOperationsJobDslContext implements Context {
     public void fileUnZipOperation(String filePath, String targetLocation) {
         FileUnZipOperation fileUnZipOperation = new FileUnZipOperation(filePath, targetLocation);
         fileOperations.add(fileUnZipOperation);
+    }
+    
+    public void fileZipOperation(String folderPath) {
+        FileZipOperation fileZipOperation = new FileZipOperation(folderPath);
+        fileOperations.add(fileZipOperation);
     }
 
     public void folderCopyOperation(String sourceFolderPath, String destinationFolderPath) {
