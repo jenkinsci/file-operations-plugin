@@ -131,7 +131,7 @@ public class FileDownloadOperation extends FileOperation implements Serializable
                 CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setRedirectStrategy(new LaxRedirectStrategy()).build();
                 HttpGet httpGet = new HttpGet(Url);
                 HttpClientContext localContext = HttpClientContext.create();
-                if (resolvedUserName != "" && resolvedPassword != "") {
+                if (!resolvedUserName.isEmpty() && !resolvedPassword.isEmpty()) {
                     localContext.setAuthCache(authCache);
                 }
                 HttpResponse response = httpClient.execute(host, httpGet, localContext);
