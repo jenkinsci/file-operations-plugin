@@ -22,7 +22,7 @@ public class FileCopyOperation extends FileOperation implements Serializable {
     private final String includes;
     private final String excludes;
     private final String targetLocation;
-    private boolean flattenFiles = false;
+    private final boolean flattenFiles;
 
     @DataBoundConstructor
     public FileCopyOperation(String includes, String excludes, String targetLocation, boolean flattenFiles) {
@@ -76,7 +76,7 @@ public class FileCopyOperation extends FileOperation implements Serializable {
         private final String resolvedIncludes;
         private final String resolvedExcludes;
         private final String resolvedTargetLocation;
-        private boolean flattenFiles = false;
+        private final boolean flattenFiles;
 
         public TargetFileCallable(TaskListener Listener, String ResolvedIncludes, String ResolvedExcludes, String ResolvedTargetLocation, boolean flattenFiles) {
             this.listener = Listener;

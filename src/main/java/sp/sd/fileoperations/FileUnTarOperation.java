@@ -21,7 +21,7 @@ import java.io.Serializable;
 public class FileUnTarOperation extends FileOperation implements Serializable {
     private final String filePath;
     private final String targetLocation;
-    private boolean isGZIP = false;
+    private final boolean isGZIP;
 
     @DataBoundConstructor
     public FileUnTarOperation(String filePath, String targetLocation, boolean isGZIP) {
@@ -69,7 +69,7 @@ public class FileUnTarOperation extends FileOperation implements Serializable {
         private final TaskListener listener;
         private final String resolvedFilePath;
         private final String resolvedTargetLocation;
-        private boolean isGZIP = false;
+        private final boolean isGZIP;
 
         public TargetFileCallable(TaskListener Listener, String ResolvedFilePath, String ResolvedTargetLocation, boolean isGZIP) {
             this.listener = Listener;

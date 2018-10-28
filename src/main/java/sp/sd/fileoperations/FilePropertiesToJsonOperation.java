@@ -99,8 +99,8 @@ public class FilePropertiesToJsonOperation extends FileOperation implements Seri
             return result;
         }
 
-        private static Pattern floatPattern = Pattern.compile("^[0-9]+(\\.[0-9]+)?$");
-        private static Pattern intPattern = Pattern.compile("^[0-9]+$");
+        private static final Pattern floatPattern = Pattern.compile("^[0-9]+(\\.[0-9]+)?$");
+        private static final Pattern intPattern = Pattern.compile("^[0-9]+$");
 
         private static String convertToJson(Properties properties) {
             JsonObject json = new JsonObject();
