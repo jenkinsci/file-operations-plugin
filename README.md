@@ -32,7 +32,7 @@ At present following Operations implemented:
   
   14) Folder Rename Operation
 
-This is will be helpful for doing cross platform file operations. 
+This is will be helpful for doing cross platform file operations.
 No need to search for Nix or Win commands to do file operations.
 
 Job DSL Details:
