@@ -33,7 +33,7 @@ public class FileCreateOperationTest {
     public void testRunFileOperationWithFileOperationBuildStep() throws Exception {
         FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
         FileCreateOperation fco = new FileCreateOperation("NewFileName.txt", "This is File Content");
-        List<FileOperation> fop = new ArrayList<FileOperation>();
+        List<FileOperation> fop = new ArrayList<>();
         fop.add(fco);
         p1.getBuildersList().add(new FileOperationsBuilder(fop));
         FreeStyleBuild build = p1.scheduleBuild2(0).get();
@@ -51,7 +51,7 @@ public class FileCreateOperationTest {
 
         FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
         FileCreateOperation fco = new FileCreateOperation("$TextFileName", "This is File Content");
-        List<FileOperation> fop = new ArrayList<FileOperation>();
+        List<FileOperation> fop = new ArrayList<>();
         fop.add(fco);
         p1.getBuildersList().add(new FileOperationsBuilder(fop));
         FreeStyleBuild build = p1.scheduleBuild2(0).get();

@@ -77,7 +77,7 @@ public class FileOperationsBuilder extends Builder implements SimpleBuildStep {
 
         @SuppressWarnings("unused")
         public List<FileOperationDescriptor> getFileOperationDescriptors() {
-            List<FileOperationDescriptor> result = new ArrayList<FileOperationDescriptor>();
+            List<FileOperationDescriptor> result = new ArrayList<>();
             Jenkins j = Jenkins.getInstance();
             if (j == null) {
                 return result;
