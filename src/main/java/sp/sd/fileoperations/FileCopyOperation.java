@@ -95,7 +95,6 @@ public class FileCopyOperation extends FileOperation implements Serializable {
                 FilePath[] resolvedFiles = fpWS.list(resolvedIncludes, resolvedExcludes);
                 if (resolvedFiles.length == 0) {
                     listener.getLogger().println("0 files found for include pattern '" + resolvedIncludes + "' and exclude pattern '" + resolvedExcludes + "'");
-                    result = true;
                 } else {
                     for (FilePath item : resolvedFiles) {
                         listener.getLogger().println(item.getRemote());
