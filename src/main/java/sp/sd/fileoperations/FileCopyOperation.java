@@ -76,14 +76,14 @@ public class FileCopyOperation extends FileOperation implements Serializable {
         private final String resolvedIncludes;
         private final String resolvedExcludes;
         private final String resolvedTargetLocation;
-        private boolean iflattenFiles = false;
+        private boolean flattenFiles = false;
 
         public TargetFileCallable(TaskListener Listener, String ResolvedIncludes, String ResolvedExcludes, String ResolvedTargetLocation, boolean flattenFiles) {
             this.listener = Listener;
             this.resolvedIncludes = ResolvedIncludes;
             this.resolvedExcludes = ResolvedExcludes;
             this.resolvedTargetLocation = ResolvedTargetLocation;
-            this.iflattenFiles = flattenFiles;
+            this.flattenFiles = flattenFiles;
         }
 
         @Override
@@ -101,7 +101,7 @@ public class FileCopyOperation extends FileOperation implements Serializable {
                         listener.getLogger().println(item.getRemote());
                     }
                 }
-                if (iflattenFiles) {
+                if (flattenFiles) {
                     for (FilePath item : resolvedFiles) {
                         item.copyTo(new FilePath(fpTL, item.getName()));
                     }

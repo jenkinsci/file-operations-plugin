@@ -69,13 +69,13 @@ public class FileUnTarOperation extends FileOperation implements Serializable {
         private final TaskListener listener;
         private final String resolvedFilePath;
         private final String resolvedTargetLocation;
-        private boolean IsGZIP = false;
+        private boolean isGZIP = false;
 
-        public TargetFileCallable(TaskListener Listener, String ResolvedFilePath, String ResolvedTargetLocation, boolean IsGZIP) {
+        public TargetFileCallable(TaskListener Listener, String ResolvedFilePath, String ResolvedTargetLocation, boolean isGZIP) {
             this.listener = Listener;
             this.resolvedFilePath = ResolvedFilePath;
             this.resolvedTargetLocation = ResolvedTargetLocation;
-            this.IsGZIP = IsGZIP;
+            this.isGZIP = isGZIP;
         }
 
         @Override
@@ -89,7 +89,7 @@ public class FileUnTarOperation extends FileOperation implements Serializable {
                 if (!fpTL.exists()) {
                     fpTL.mkdirs();
                 }
-                if (IsGZIP) {
+                if (isGZIP) {
                     fpSrcTar.untar(fpTL, FilePath.TarCompression.GZIP);
                     result = true;
                     listener.getLogger().println("Untar completed.");
