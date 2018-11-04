@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 
+import javax.annotation.Nonnull;
 import java.util.Collections;
 
 public class FileOperationsBuilder extends Builder implements SimpleBuildStep {
@@ -35,7 +36,8 @@ public class FileOperationsBuilder extends Builder implements SimpleBuildStep {
     }
 
     @Override
-    public void perform(Run build, FilePath workspace, Launcher launcher, TaskListener listener) throws AbortException {
+    public void perform(@Nonnull Run build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener)
+            throws AbortException {
         boolean result = false;
         if (fileOperations.size() > 0) {
             for (FileOperation item : fileOperations) {
@@ -77,7 +79,7 @@ public class FileOperationsBuilder extends Builder implements SimpleBuildStep {
 
         @SuppressWarnings("unused")
         public List<FileOperationDescriptor> getFileOperationDescriptors() {
-            List<FileOperationDescriptor> result = new ArrayList<FileOperationDescriptor>();
+            List<FileOperationDescriptor> result = new ArrayList<>();
             Jenkins j = Jenkins.getInstance();
             if (j == null) {
                 return result;

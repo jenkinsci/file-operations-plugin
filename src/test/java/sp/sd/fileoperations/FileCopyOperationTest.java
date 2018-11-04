@@ -1,16 +1,6 @@
 package sp.sd.fileoperations;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-
-import hudson.EnvVars;
-import hudson.model.FreeStyleBuild;
-import hudson.model.Result;
-import hudson.model.FreeStyleProject;
-import hudson.slaves.EnvironmentVariablesNodeProperty;
-
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Rule;
 import org.junit.Test;

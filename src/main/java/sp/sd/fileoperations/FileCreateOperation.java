@@ -70,7 +70,7 @@ public class FileCreateOperation extends FileOperation implements Serializable {
 
         @Override
         public Boolean invoke(File ws, VirtualChannel channel) {
-            boolean result = false;
+            boolean result;
             try {
                 FilePath fpWS = new FilePath(ws);
                 FilePath fpTL = new FilePath(fpWS, resolvedFileName);

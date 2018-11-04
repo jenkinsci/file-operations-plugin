@@ -21,7 +21,7 @@ import java.io.Serializable;
 public class FileUnTarOperation extends FileOperation implements Serializable {
     private final String filePath;
     private final String targetLocation;
-    private boolean isGZIP = false;
+    private final boolean isGZIP;
 
     @DataBoundConstructor
     public FileUnTarOperation(String filePath, String targetLocation, boolean isGZIP) {
@@ -69,18 +69,18 @@ public class FileUnTarOperation extends FileOperation implements Serializable {
         private final TaskListener listener;
         private final String resolvedFilePath;
         private final String resolvedTargetLocation;
-        private boolean IsGZIP = false;
+        private final boolean isGZIP;
 
-        public TargetFileCallable(TaskListener Listener, String ResolvedFilePath, String ResolvedTargetLocation, boolean IsGZIP) {
+        public TargetFileCallable(TaskListener Listener, String ResolvedFilePath, String ResolvedTargetLocation, boolean isGZIP) {
             this.listener = Listener;
             this.resolvedFilePath = ResolvedFilePath;
             this.resolvedTargetLocation = ResolvedTargetLocation;
-            this.IsGZIP = IsGZIP;
+            this.isGZIP = isGZIP;
         }
 
         @Override
         public Boolean invoke(File ws, VirtualChannel channel) {
-            boolean result = false;
+            boolean result;
             try {
                 FilePath fpWS = new FilePath(ws);
                 FilePath fpSrcTar = new FilePath(fpWS, resolvedFilePath);
@@ -89,7 +89,7 @@ public class FileUnTarOperation extends FileOperation implements Serializable {
                 if (!fpTL.exists()) {
                     fpTL.mkdirs();
                 }
-                if (IsGZIP) {
+                if (isGZIP) {
                     fpSrcTar.untar(fpTL, FilePath.TarCompression.GZIP);
                     result = true;
                     listener.getLogger().println("Untar completed.");

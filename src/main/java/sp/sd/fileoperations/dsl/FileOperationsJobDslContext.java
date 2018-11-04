@@ -22,7 +22,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class FileOperationsJobDslContext implements Context {
-    List<FileOperation> fileOperations = new ArrayList<>();
+    final List<FileOperation> fileOperations = new ArrayList<>();
 
     public void fileCreateOperation(String fileName, String fileContent) {
         FileCreateOperation fileCreateOperation = new FileCreateOperation(fileName, fileContent);
@@ -68,7 +68,7 @@ public class FileOperationsJobDslContext implements Context {
         FileUnZipOperation fileUnZipOperation = new FileUnZipOperation(filePath, targetLocation);
         fileOperations.add(fileUnZipOperation);
     }
-    
+
     public void fileZipOperation(String folderPath) {
         FileZipOperation fileZipOperation = new FileZipOperation(folderPath);
         fileOperations.add(fileZipOperation);

@@ -22,7 +22,7 @@ public class FileCopyOperation extends FileOperation implements Serializable {
     private final String includes;
     private final String excludes;
     private final String targetLocation;
-    private boolean flattenFiles = false;
+    private final boolean flattenFiles;
 
     @DataBoundConstructor
     public FileCopyOperation(String includes, String excludes, String targetLocation, boolean flattenFiles) {
@@ -76,32 +76,31 @@ public class FileCopyOperation extends FileOperation implements Serializable {
         private final String resolvedIncludes;
         private final String resolvedExcludes;
         private final String resolvedTargetLocation;
-        private boolean iflattenFiles = false;
+        private final boolean flattenFiles;
 
         public TargetFileCallable(TaskListener Listener, String ResolvedIncludes, String ResolvedExcludes, String ResolvedTargetLocation, boolean flattenFiles) {
             this.listener = Listener;
             this.resolvedIncludes = ResolvedIncludes;
             this.resolvedExcludes = ResolvedExcludes;
             this.resolvedTargetLocation = ResolvedTargetLocation;
-            this.iflattenFiles = flattenFiles;
+            this.flattenFiles = flattenFiles;
         }
 
         @Override
         public Boolean invoke(File ws, VirtualChannel channel) {
-            boolean result = false;
+            boolean result;
             try {
                 FilePath fpWS = new FilePath(ws);
                 FilePath fpTL = new FilePath(fpWS, resolvedTargetLocation);
                 FilePath[] resolvedFiles = fpWS.list(resolvedIncludes, resolvedExcludes);
                 if (resolvedFiles.length == 0) {
                     listener.getLogger().println("0 files found for include pattern '" + resolvedIncludes + "' and exclude pattern '" + resolvedExcludes + "'");
-                    result = true;
                 } else {
                     for (FilePath item : resolvedFiles) {
                         listener.getLogger().println(item.getRemote());
                     }
                 }
-                if (iflattenFiles) {
+                if (flattenFiles) {
                     for (FilePath item : resolvedFiles) {
                         item.copyTo(new FilePath(fpTL, item.getName()));
                     }

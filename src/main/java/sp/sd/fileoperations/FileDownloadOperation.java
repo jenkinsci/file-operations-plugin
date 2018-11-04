@@ -114,7 +114,7 @@ public class FileDownloadOperation extends FileOperation implements Serializable
 
         @Override
         public Boolean invoke(File ws, VirtualChannel channel) {
-            boolean result = false;
+            boolean result;
             try {
                 FilePath fpWS = new FilePath(ws);
                 FilePath fpTL = new FilePath(fpWS, resolvedTargetLocation);
@@ -136,8 +136,7 @@ public class FileDownloadOperation extends FileOperation implements Serializable
                 }
                 HttpResponse response = httpClient.execute(host, httpGet, localContext);
                 HttpEntity entity = response.getEntity();
-                OutputStream fosTarget = new FileOutputStream(fTarget);
-                try {
+                try (OutputStream fosTarget = new FileOutputStream(fTarget)) {
                     if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
                         result = false;
                     } else {
@@ -145,8 +144,6 @@ public class FileDownloadOperation extends FileOperation implements Serializable
                         result = true;
                         listener.getLogger().println("Completed downloading file.");
                     }
-                } finally {
-                    fosTarget.close();
                 }
             } catch (RuntimeException e) {
                 listener.fatalError(e.getMessage());

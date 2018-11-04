@@ -28,7 +28,7 @@ public class FileOperationsBuilderTest {
     @Test
     @WithoutJenkins
     public void testSettersAndGetters() {
-        List<FileOperation> fo = new ArrayList<FileOperation>();
+        List<FileOperation> fo = new ArrayList<>();
         FileOperationsBuilder fob = new FileOperationsBuilder(fo);
         assertEquals(0, fob.getFileOperations().size());
     }

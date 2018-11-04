@@ -2,7 +2,6 @@ package sp.sd.fileoperations;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import hudson.EnvVars;
 import hudson.model.FreeStyleBuild;
@@ -35,7 +34,7 @@ public class FileDeleteOperationTest {
         FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
         FileCreateOperation fco = new FileCreateOperation("NewFileName.txt", "This is File Content");
         FileDeleteOperation fdo = new FileDeleteOperation("**/*.txt", "**/*.xml");
-        List<FileOperation> fop = new ArrayList<FileOperation>();
+        List<FileOperation> fop = new ArrayList<>();
         fop.add(fco);
         fop.add(fdo);
         p1.getBuildersList().add(new FileOperationsBuilder(fop));
@@ -55,7 +54,7 @@ public class FileDeleteOperationTest {
         FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
         FileCreateOperation fco = new FileCreateOperation("$TextFileName", "This is File Content");
         FileDeleteOperation fdo = new FileDeleteOperation("**/*.txt", "**/*.xml");
-        List<FileOperation> fop = new ArrayList<FileOperation>();
+        List<FileOperation> fop = new ArrayList<>();
         fop.add(fco);
         fop.add(fdo);
         p1.getBuildersList().add(new FileOperationsBuilder(fop));

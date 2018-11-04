@@ -1,8 +1,8 @@
-<?jelly escape-by-default='true'?> 
+<?jelly escape-by-default='true'?>
 <j:jelly xmlns:j="jelly:core" xmlns:st="jelly:stapler" xmlns:f="/lib/form">
     <f:block>
         <f:hetero-list name="fileOperations" items="${instance.fileOperations}" hasHeader="true"
     descriptors="${descriptor.fileOperationDescriptors}"
     targetType="${sp.sd.fileoperations.FileOperation.class}" />
     </f:block>
-</j:jelly> 
+</j:jelly>
