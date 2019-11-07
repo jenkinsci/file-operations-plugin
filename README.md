@@ -44,7 +44,7 @@ Job DSL Details:
             fileCreateOperation(String fileName, String fileContent)
             fileCopyOperation(String includes, String excludes, String targetLocation, boolean flattenFiles)
             fileDeleteOperation(String includes, String excludes)
-            fileDownloadOperation(String url, String userName, String password, String targetLocation, String targetFileName)
+            fileDownloadOperation(String url, String userName, String password, String targetLocation, String targetFileName, String proxyHost, String proxyPort)
             fileJoinOperation(String sourceFile, String targetFile)
             filePropertiesToJsonOperation(String sourceFile, String targetFile)
             fileTransformOperation(String includes, String excludes)
@@ -66,7 +66,7 @@ Job DSL Details:
           fileOperations {
             fileCreateOperation('testdsl.txt','test content')
             fileCopyOperation('testdsl.txt','','.',false)
-            fileDownloadOperation('http://192.168.56.1:8081/service/local/repositories/MyWorks/content/sp/sd/test-artifact/40/test-artifact-40-debug.zip','','','.','test.zip')
+            fileDownloadOperation('http://192.168.56.1:8081/service/local/repositories/MyWorks/content/sp/sd/test-artifact/40/test-artifact-40-debug.zip','','','.','test.zip', 'proxy', '3128')
             fileDeleteOperation('testdsl.txt','')
             fileDeleteOperation('test.zip','')
             fileJoinOperation('testsource.txt','testtarget.txt')
