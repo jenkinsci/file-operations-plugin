@@ -8,6 +8,7 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 
 import hudson.util.Secret;
+import org.apache.http.impl.client.*;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -28,11 +29,6 @@ import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.protocol.HttpClientContext;
 import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicAuthCache;
-import org.apache.http.impl.client.BasicCredentialsProvider;
-import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClients;
-import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.jenkinsci.remoting.RoleChecker;
 
 import java.io.Serializable;
@@ -45,14 +41,18 @@ public class FileDownloadOperation extends FileOperation implements Serializable
     private final String targetLocation;
     private final String targetFileName;
     private final String password;
+    private final String proxyHost;
+    private final String proxyPort;
 
     @DataBoundConstructor
-    public FileDownloadOperation(String url, String userName, String password, String targetLocation, String targetFileName) {
+    public FileDownloadOperation(String url, String userName, String password, String targetLocation, String targetFileName, String proxyHost, String proxyPort) {
         this.url = url;
         this.userName = userName;
         this.targetLocation = targetLocation;
         this.targetFileName = targetFileName;
         this.password = Secret.fromString(password).getEncryptedValue();
+        this.proxyHost=proxyHost;
+        this.proxyPort=proxyPort;
     }
 
     public String getUrl() {
@@ -75,6 +75,14 @@ public class FileDownloadOperation extends FileOperation implements Serializable
         return Secret.decrypt(password).getPlainText();
     }
 
+    public String getProxyHost() {
+        return proxyHost;
+    }
+
+    public String getProxyPort() {
+        return proxyPort;
+    }
+
     public boolean runOperation(Run<?, ?> run, FilePath buildWorkspace, Launcher launcher, TaskListener listener) {
         boolean result = false;
         try {
@@ -82,7 +90,14 @@ public class FileDownloadOperation extends FileOperation implements Serializable
             EnvVars envVars = run.getEnvironment(listener);
             try {
                 FilePath ws = new FilePath(buildWorkspace, ".");
-                result = ws.act(new TargetFileCallable(listener, envVars.expand(url), envVars.expand(userName), envVars.expand(Secret.decrypt(password).getPlainText()), envVars.expand(targetLocation), envVars.expand(targetFileName)));
+                result = ws.act(new TargetFileCallable(listener,
+                        envVars.expand(url),
+                        envVars.expand(userName),
+                        envVars.expand(Secret.decrypt(password).getPlainText()),
+                        envVars.expand(targetLocation),
+                        envVars.expand(targetFileName),
+                        envVars.expand(proxyHost),
+                        envVars.expand(proxyPort)));
             } catch (Exception e) {
                 listener.fatalError(e.getMessage());
                 return false;
@@ -102,14 +117,18 @@ public class FileDownloadOperation extends FileOperation implements Serializable
         private final String resolvedTargetLocation;
         private final String resolvedTargetFileName;
         private final String resolvedPassword;
+        private final String proxyHost;
+        private final String proxyPort;
 
-        public TargetFileCallable(TaskListener Listener, String ResolvedUrl, String ResolvedUserName, String ResolvedPassword, String ResolvedTargetLocation, String ResolvedTargetFileName) {
+        public TargetFileCallable(TaskListener Listener, String ResolvedUrl, String ResolvedUserName, String ResolvedPassword, String ResolvedTargetLocation, String ResolvedTargetFileName, String proxyHost, String proxyPort) {
             this.listener = Listener;
             this.resolvedUrl = ResolvedUrl;
             this.resolvedUserName = ResolvedUserName;
             this.resolvedTargetLocation = ResolvedTargetLocation;
             this.resolvedTargetFileName = ResolvedTargetFileName;
             this.resolvedPassword = ResolvedPassword;
+            this.proxyHost = proxyHost;
+            this.proxyPort = proxyPort;
         }
 
         @Override
@@ -128,7 +147,16 @@ public class FileDownloadOperation extends FileOperation implements Serializable
                 AuthCache authCache = new BasicAuthCache();
                 BasicScheme basicAuth = new BasicScheme();
                 authCache.put(host, basicAuth);
-                CloseableHttpClient httpClient = HttpClients.custom().setDefaultCredentialsProvider(credsProvider).setRedirectStrategy(new LaxRedirectStrategy()).build();
+
+                HttpClientBuilder httpClientBuilder = HttpClients.custom()
+                        .setDefaultCredentialsProvider(credsProvider);
+
+                if (proxyHost != null && !proxyHost.isEmpty()
+                        && proxyPort != null && proxyPort.matches("[0-9]+")) {
+                    HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort));
+                    httpClientBuilder.setProxy(proxy);
+                }
+                CloseableHttpClient httpClient = httpClientBuilder.setRedirectStrategy(new LaxRedirectStrategy()).build();
                 HttpGet httpGet = new HttpGet(Url);
                 HttpClientContext localContext = HttpClientContext.create();
                 if (!resolvedUserName.isEmpty() && !resolvedPassword.isEmpty()) {

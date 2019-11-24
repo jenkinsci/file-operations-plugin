@@ -39,8 +39,8 @@ public class FileOperationsJobDslContext implements Context {
         fileOperations.add(fileDeleteOperation);
     }
 
-    public void fileDownloadOperation(String url, String userName, String password, String targetLocation, String targetFileName) {
-        FileDownloadOperation fileDownloadOperation = new FileDownloadOperation(url, userName, password, targetLocation, targetFileName);
+    public void fileDownloadOperation(String url, String userName, String password, String targetLocation, String targetFileName, String proxyHost, String proxyPort) {
+        FileDownloadOperation fileDownloadOperation = new FileDownloadOperation(url, userName, password, targetLocation, targetFileName, proxyHost, proxyPort);
         fileOperations.add(fileDownloadOperation);
     }
 

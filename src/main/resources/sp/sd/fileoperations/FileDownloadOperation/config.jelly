@@ -15,4 +15,10 @@
     <f:entry title="Target File Name" field="targetFileName">
         <f:textbox field="targetFileName" />
     </f:entry>
+    <f:entry title="Proxy Host" field="proxyHost">
+        <f:textbox field="proxyHost" />
+    </f:entry>
+    <f:entry title="Proxy Port"  field="proxyPort">
+        <f:textbox field="proxyPort" />
+    </f:entry>
 </j:jelly>
