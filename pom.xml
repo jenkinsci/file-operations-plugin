@@ -6,12 +6,12 @@
         <groupId>org.jenkins-ci.plugins</groupId>
         <artifactId>plugin</artifactId>
         <version>2.37</version>
-        <relativePath/>
+        <relativePath />
     </parent>
 
     <groupId>sp.sd</groupId>
     <artifactId>file-operations</artifactId>
-    <version>1.8-SNAPSHOT</version>
+    <version>1.8</version>
     <packaging>hpi</packaging>
 
     <name>File Operations Plugin</name>
@@ -36,7 +36,7 @@
         <connection>scm:git:git://github.com/jenkinsci/${project.artifactId}-plugin.git</connection>
         <developerConnection>scm:git:git@github.com:jenkinsci/${project.artifactId}-plugin.git</developerConnection>
         <url>http://github.com/jenkinsci/${project.artifactId}-plugin</url>
-        <tag>HEAD</tag>
+        <tag>file-operations-1.8</tag>
     </scm>
 
     <properties>
