@@ -23,13 +23,25 @@ public class FileCopyOperation extends FileOperation implements Serializable {
     private final String excludes;
     private final String targetLocation;
     private final boolean flattenFiles;
+    private final boolean renameFiles;
+    private final String sourceCaptureExpression;
+    private final String targetNameExpression;
 
     @DataBoundConstructor
-    public FileCopyOperation(String includes, String excludes, String targetLocation, boolean flattenFiles) {
+    public FileCopyOperation(String includes,
+                             String excludes,
+                             String targetLocation,
+                             boolean flattenFiles,
+                             boolean renameFiles,
+                             String sourceCaptureExpression,
+                             String targetNameExpression) {
         this.includes = includes;
         this.excludes = excludes;
         this.targetLocation = targetLocation;
         this.flattenFiles = flattenFiles;
+        this.renameFiles = renameFiles;
+        this.sourceCaptureExpression = sourceCaptureExpression;
+        this.targetNameExpression = targetNameExpression;
     }
 
     public String getIncludes() {
@@ -48,6 +60,18 @@ public class FileCopyOperation extends FileOperation implements Serializable {
         return flattenFiles;
     }
 
+    public boolean getRenameFiles() {
+        return renameFiles;
+    }
+
+    public String getSourceCaptureExpression() {
+        return sourceCaptureExpression;
+    }
+
+    public String getTargetNameExpression() {
+        return targetNameExpression;
+    }
+
     public boolean runOperation(Run<?, ?> run, FilePath buildWorkspace, Launcher launcher, TaskListener listener) {
         boolean result = false;
         try {
@@ -55,7 +79,14 @@ public class FileCopyOperation extends FileOperation implements Serializable {
             EnvVars envVars = run.getEnvironment(listener);
             try {
                 FilePath ws = new FilePath(buildWorkspace, ".");
-                result = ws.act(new TargetFileCallable(listener, envVars.expand(includes), envVars.expand(excludes), envVars.expand(targetLocation), flattenFiles));
+                result = ws.act(new TargetFileCallable(listener,
+                                                       envVars.expand(includes),
+                                                       envVars.expand(excludes),
+                                                       envVars.expand(targetLocation),
+                                                       flattenFiles,
+                                                       renameFiles,
+                                                       sourceCaptureExpression,
+                                                       targetNameExpression));
             } catch (RuntimeException e) {
                 listener.getLogger().println(e.getMessage());
                 throw e;
@@ -77,13 +108,26 @@ public class FileCopyOperation extends FileOperation implements Serializable {
         private final String resolvedExcludes;
         private final String resolvedTargetLocation;
         private final boolean flattenFiles;
+        private final boolean renameFiles;
+        private final String sourceCaptureExpression;
+        private final String targetNameExpression;
 
-        public TargetFileCallable(TaskListener Listener, String ResolvedIncludes, String ResolvedExcludes, String ResolvedTargetLocation, boolean flattenFiles) {
+        public TargetFileCallable(TaskListener Listener,
+                                  String ResolvedIncludes,
+                                  String ResolvedExcludes,
+                                  String ResolvedTargetLocation,
+                                  boolean flattenFiles,
+                                  boolean renameFiles,
+                                  String sourceCaptureExpression,
+                                  String targetNameExpression) {
             this.listener = Listener;
             this.resolvedIncludes = ResolvedIncludes;
             this.resolvedExcludes = ResolvedExcludes;
             this.resolvedTargetLocation = ResolvedTargetLocation;
             this.flattenFiles = flattenFiles;
+            this.renameFiles = renameFiles;
+            this.sourceCaptureExpression = sourceCaptureExpression;
+            this.targetNameExpression = targetNameExpression;
         }
 
         @Override
@@ -95,17 +139,24 @@ public class FileCopyOperation extends FileOperation implements Serializable {
                 FilePath[] resolvedFiles = fpWS.list(resolvedIncludes, resolvedExcludes);
                 if (resolvedFiles.length == 0) {
                     listener.getLogger().println("0 files found for include pattern '" + resolvedIncludes + "' and exclude pattern '" + resolvedExcludes + "'");
+                }
+                if (flattenFiles) {
+                    for (FilePath item : resolvedFiles) {
+                        if (renameFiles) {
+                            String targetFileName = item.getRemote().replaceAll(sourceCaptureExpression, targetNameExpression);
+                            FilePath fpTF = new FilePath(fpTL, targetFileName);
+                            listener.getLogger().println("Copy from " + item.getRemote() + " to " + fpTF);
+                            item.copyTo(fpTF);
+                        } else {
+                            listener.getLogger().println(item.getRemote());
+                            item.copyTo(new FilePath(fpTL, item.getName()));
+                        }
+                    }
+                    result = true;
                 } else {
                     for (FilePath item : resolvedFiles) {
                         listener.getLogger().println(item.getRemote());
                     }
-                }
-                if (flattenFiles) {
-                    for (FilePath item : resolvedFiles) {
-                        item.copyTo(new FilePath(fpTL, item.getName()));
-                    }
-                    result = true;
-                } else {
                     fpWS.copyRecursiveTo(resolvedIncludes, resolvedExcludes, fpTL);
                     result = true;
                 }
