@@ -28,6 +28,9 @@ public class FileCopyOperationTest {
         assertEquals("**/*.xml", fco.getExcludes());
         assertEquals("target", fco.getTargetLocation());
         assertEquals(true, fco.getFlattenFiles());
+        assertEquals(false, fco.getRenameFiles());
+        assertEquals(null, fco.getSourceCaptureExpression());
+        assertEquals(null, fco.getTargetNameExpression());
     }
 
     @Test
@@ -74,13 +77,19 @@ public class FileCopyOperationTest {
         fop.add(new FileCreateOperation("test-results-xml/pod-0/classB/TestB.xml", ""));
         fop.add(new FileCreateOperation("test-results-xml/pod-1/classB/TestB.xml", ""));
         fop.add(new FileCreateOperation("test-results-xml/pod-1/classC/TestC.xml", ""));
-        fop.add(new FileCopyOperation("test-results-xml/**/*.xml",
-                                      "",
-                                      "test-results",
-                                      true,
-                                      true,
-                                      ".*/test-results-xml/.*-([\\d]+)/.*/([^/]+)$",
-                                      "$1-$2"));
+
+        // Required to handle test being run on either Windows or Unix systems
+        String dirSep = "(?:\\\\|/)";
+
+        fop.add(new FileCopyOperation(
+                "test-results-xml/**/*.xml",
+                "",
+                "test-results",
+                true,
+                true,
+                ".*" + dirSep + "test-results-xml" + dirSep + ".*-([\\d]+)" +
+                        dirSep + ".*" + dirSep + "([^" + dirSep + "]+)$",
+                "$1-$2"));
         p1.getBuildersList().add(new FileOperationsBuilder(fop));
         FreeStyleBuild build = p1.scheduleBuild2(0).get();
         assertEquals(Result.SUCCESS, build.getResult());

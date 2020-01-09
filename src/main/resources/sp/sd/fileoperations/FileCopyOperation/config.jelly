@@ -9,14 +9,18 @@
     <f:entry title="Target Location" field="targetLocation">
         <f:textbox field="targetLocation" />
     </f:entry>
-    <f:optionalBlock title="Flatten" field="flattenFiles">
-        <f:optionalBlock title="Rename Files" field="renameFiles">
-            <f:entry title="Source Capture Expression" field="sourceCaptureExpression">
-                <f:textbox field="sourceCaptureExpression" />
-            </f:entry>
-            <f:entry title="Target Name Expression" field="targetNameExpression">
-                <f:textbox field="targetNameExpression" />
-            </f:entry>
-        </f:optionalBlock>
-    </f:optionalBlock>
+    <f:entry title="Flatten" field="flattenFiles">
+        <f:checkbox field="flattenFiles" />
+    </f:entry>
+    <f:advanced>
+        <f:entry title="Rename Files" field="renameFiles">
+            <f:checkbox field="renameFiles" />
+        </f:entry>
+        <f:entry title="Source Capture Expression" field="sourceCaptureExpression">
+            <f:textbox field="sourceCaptureExpression" />
+        </f:entry>
+        <f:entry title="Target Name Expression" field="targetNameExpression">
+            <f:textbox field="targetNameExpression" />
+        </f:entry>
+    </f:advanced>
 </j:jelly>
