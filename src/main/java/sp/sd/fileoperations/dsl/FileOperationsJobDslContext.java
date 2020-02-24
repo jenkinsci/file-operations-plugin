@@ -29,8 +29,20 @@ public class FileOperationsJobDslContext implements Context {
         fileOperations.add(fileCreateOperation);
     }
 
-    public void fileCopyOperation(String includes, String excludes, String targetLocation, boolean flattenFiles) {
-        FileCopyOperation fileCopyOperation = new FileCopyOperation(includes, excludes, targetLocation, flattenFiles);
+    public void fileCopyOperation(String includes,
+                                  String excludes,
+                                  String targetLocation,
+                                  boolean flattenFiles,
+                                  boolean renameFiles,
+                                  String sourceCaptureExpression,
+                                  String targetNameExpression) {
+        FileCopyOperation fileCopyOperation = new FileCopyOperation(includes,
+                                                                    excludes,
+                                                                    targetLocation,
+                                                                    flattenFiles,
+                                                                    renameFiles,
+                                                                    sourceCaptureExpression,
+                                                                    targetNameExpression);
         fileOperations.add(fileCopyOperation);
     }
 
