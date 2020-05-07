@@ -81,8 +81,8 @@ public class FileOperationsJobDslContext implements Context {
         fileOperations.add(fileUnZipOperation);
     }
 
-    public void fileZipOperation(String folderPath) {
-        FileZipOperation fileZipOperation = new FileZipOperation(folderPath);
+    public void fileZipOperation(String folderPath, String outputFolderPath) {
+        FileZipOperation fileZipOperation = new FileZipOperation(folderPath, outputFolderPath);
         fileOperations.add(fileZipOperation);
     }
 
