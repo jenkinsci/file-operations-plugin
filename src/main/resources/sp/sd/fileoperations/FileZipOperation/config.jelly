@@ -3,4 +3,7 @@
     <f:entry title="Folder Path" field="folderPath">
         <f:textbox field="folderPath" />
     </f:entry>
+    <f:entry title="Output Folder Path" field="outputFolderPath">
+        <f:textbox field="outputFolderPath" />
+    </f:entry>
 </j:jelly>
