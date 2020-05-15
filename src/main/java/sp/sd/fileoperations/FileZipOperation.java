@@ -17,10 +17,12 @@ import java.io.Serializable;
 public class FileZipOperation extends FileOperation implements Serializable {
 
     private final String folderPath;
+    private final String outputFolderPath;
 
     @DataBoundConstructor
-    public FileZipOperation(String folderPath) {
+    public FileZipOperation(String folderPath, String outputFolderPath) {
         this.folderPath = folderPath;
+        this.outputFolderPath = outputFolderPath;
     }
 
     public String getFolderPath() {
@@ -34,7 +36,7 @@ public class FileZipOperation extends FileOperation implements Serializable {
             EnvVars envVars = run.getEnvironment(listener);
             try {
                 FilePath ws = new FilePath(buildWorkspace, ".");
-                result = ws.act(new TargetFileCallable(listener, envVars.expand(folderPath), envVars));
+                result = ws.act(new TargetFileCallable(listener, envVars.expand(folderPath), envVars.expand(outputFolderPath), envVars));
             } catch (Exception e) {
                 listener.fatalError(e.getMessage());
                 return false;
@@ -50,10 +52,12 @@ public class FileZipOperation extends FileOperation implements Serializable {
         private final TaskListener listener;
         private final EnvVars environment;
         private final String resolvedFolderPath;
+        private final String outputFolderPath;
 
-        public TargetFileCallable(TaskListener Listener, String ResolvedFolderPath, EnvVars environment) {
+        public TargetFileCallable(TaskListener Listener, String ResolvedFolderPath, String outputFolderPath, EnvVars environment) {
             this.listener = Listener;
             this.resolvedFolderPath = ResolvedFolderPath;
+            this.outputFolderPath = outputFolderPath;
             this.environment = environment;
         }
 
@@ -62,9 +66,10 @@ public class FileZipOperation extends FileOperation implements Serializable {
             boolean result;
             try {
                 FilePath fpWS = new FilePath(ws);
+                FilePath fpWSOutput = new FilePath(fpWS, outputFolderPath);
                 FilePath fpTL = new FilePath(fpWS, resolvedFolderPath);
                 listener.getLogger().println("Creating Zip file of " + fpTL.getRemote());
-                fpTL.zip(new FilePath(fpWS, fpTL.getName() + ".zip"));
+                fpTL.zip(new FilePath(fpWSOutput, fpTL.getName() + ".zip"));
                 result = true;
             } catch (RuntimeException e) {
                 listener.fatalError(e.getMessage());
