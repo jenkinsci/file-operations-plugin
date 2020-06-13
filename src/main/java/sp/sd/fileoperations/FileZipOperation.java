@@ -29,6 +29,10 @@ public class FileZipOperation extends FileOperation implements Serializable {
         return folderPath;
     }
 
+    public String getOutputFolderPath() {
+        return outputFolderPath;
+    }
+
     public boolean runOperation(Run<?, ?> run, FilePath buildWorkspace, Launcher launcher, TaskListener listener) {
         boolean result = false;
         try {
@@ -66,9 +70,11 @@ public class FileZipOperation extends FileOperation implements Serializable {
             boolean result;
             try {
                 FilePath fpWS = new FilePath(ws);
-                FilePath fpWSOutput = new FilePath(fpWS, outputFolderPath);
+                FilePath fpWSOutput = 
+                    new FilePath(fpWS, (outputFolderPath != null ? outputFolderPath : ""));
                 FilePath fpTL = new FilePath(fpWS, resolvedFolderPath);
-                listener.getLogger().println("Creating Zip file of " + fpTL.getRemote());
+                listener.getLogger().println(
+                    "Creating Zip file of " + fpTL.getRemote() + " in " + fpWSOutput);
                 fpTL.zip(new FilePath(fpWSOutput, fpTL.getName() + ".zip"));
                 result = true;
             } catch (RuntimeException e) {
