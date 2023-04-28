@@ -12,6 +12,8 @@ import org.apache.http.impl.client.*;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
+
 import java.io.FileOutputStream;
 import java.io.File;
 import java.io.OutputStream;
@@ -71,6 +73,7 @@ public class FileDownloadOperation extends FileOperation implements Serializable
         return targetFileName;
     }
 
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public String getPassword() {
         return Secret.decrypt(password).getPlainText();
     }
@@ -83,6 +86,7 @@ public class FileDownloadOperation extends FileOperation implements Serializable
         return proxyPort;
     }
 
+    @SuppressFBWarnings("NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE")
     public boolean runOperation(Run<?, ?> run, FilePath buildWorkspace, Launcher launcher, TaskListener listener) {
         boolean result = false;
         try {
