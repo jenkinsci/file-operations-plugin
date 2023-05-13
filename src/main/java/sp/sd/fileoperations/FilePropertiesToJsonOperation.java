@@ -1,7 +1,8 @@
 package sp.sd.fileoperations;
 
-import com.google.gson.Gson;
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.ObjectNode;
 import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.Extension;
@@ -103,20 +104,22 @@ public class FilePropertiesToJsonOperation extends FileOperation implements Seri
         private static final Pattern intPattern = Pattern.compile("^[0-9]+$");
 
         private static String convertToJson(Properties properties) {
-            JsonObject json = new JsonObject();
+            ObjectMapper objectMapper = new ObjectMapper();
+            ObjectNode json = objectMapper.createObjectNode();
             for (Object key : properties.keySet()) {
                 String value = properties.getProperty(key.toString());
                 if (value.equals("true") || value.equals("false")) {
-                    json.addProperty(key.toString(), Boolean.parseBoolean(value));
+                    json.put(key.toString(), Boolean.parseBoolean(value));
                 } else if (intPattern.matcher(value).matches()) {
-                    json.addProperty(key.toString(), Integer.parseInt(value));
+                    json.put(key.toString(), Integer.parseInt(value));
                 } else if (floatPattern.matcher(value).matches()) {
-                    json.addProperty(key.toString(), Float.parseFloat(value));
+                    json.put(key.toString(), Float.parseFloat(value));
                 } else {
-                    json.addProperty(key.toString(), value);
+                    json.put(key.toString(), value);
                 }
             }
-            return new Gson().toJson(json);
+            JsonNode rootNode = json;
+            return rootNode.toString();
         }
 
         @Override
