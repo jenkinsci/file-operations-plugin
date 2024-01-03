@@ -1,6 +1,8 @@
 # File Operations Plugin
 
 [![Jenkins Plugin](https://img.shields.io/jenkins/plugin/v/file-operations)](https://plugins.jenkins.io/file-operations)
+[![Coverage](https://ci.jenkins.io/job/Plugins/job/file-operations-plugin/job/main/badge/icon?status=${instructionCoverage}&subject=coverage&color=${colorInstructionCoverage})](https://ci.jenkins.io/job/Plugins/job/file-operations-plugin/job/main)
+[![LOC](https://ci.jenkins.io/job/Plugins/job/file-operations-plugin/job/main/badge/icon?job=test&status=${lineOfCode}&subject=line%20of%20code&color=blue)](https://ci.jenkins.io/job/Plugins/job/file-operations-plugin/job/main)
 [![Changelog](https://img.shields.io/github/v/tag/jenkinsci/file-operations-plugin?label=changelog)](https://github.com/jenkinsci/file-operations-plugin/blob/master/docs/CHANGELOG.md)
 [![Jenkins Plugin Installs](https://img.shields.io/jenkins/plugin/i/file-operations?color=blue)](https://plugins.jenkins.io/file-operations)
 
