@@ -42,7 +42,7 @@
     <properties>
         <changelist>999999-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/file-operations-plugin</gitHubRepo>
-        <jenkins.version>2.426.3</jenkins.version>
+        <jenkins.version>2.440.2</jenkins.version>
     </properties>
     <dependencyManagement>
         <dependencies>
