@@ -19,7 +19,7 @@ import java.util.ArrayList;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
 
-import javax.annotation.Nonnull;
+import edu.umd.cs.findbugs.annotations.NonNull;
 import java.util.Collections;
 
 public class FileOperationsBuilder extends Builder implements SimpleBuildStep {
@@ -36,7 +36,7 @@ public class FileOperationsBuilder extends Builder implements SimpleBuildStep {
     }
 
     @Override
-    public void perform(@Nonnull Run build, @Nonnull FilePath workspace, @Nonnull Launcher launcher, @Nonnull TaskListener listener)
+    public void perform(@NonNull Run build, @NonNull FilePath workspace, @NonNull Launcher launcher, @NonNull TaskListener listener)
             throws AbortException {
         boolean result = false;
         if (fileOperations.size() > 0) {
