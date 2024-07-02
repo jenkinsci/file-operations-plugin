@@ -42,13 +42,13 @@
     <properties>
         <changelist>999999-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/file-operations-plugin</gitHubRepo>
-        <jenkins.version>2.440.3</jenkins.version>
+        <jenkins.version>2.452.2</jenkins.version>
     </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.440.x</artifactId>
+                <artifactId>bom-2.452.x</artifactId>
                 <version>3157.vb_3e8b_8a_d185d</version>
                 <type>pom</type>
                 <scope>import</scope>
