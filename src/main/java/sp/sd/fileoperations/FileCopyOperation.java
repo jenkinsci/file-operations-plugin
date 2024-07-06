@@ -11,8 +11,10 @@ import hudson.remoting.VirtualChannel;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 
 import java.io.File;
+import hudson.util.DirScanner;
 import java.io.Serializable;
 
 public class FileCopyOperation extends FileOperation implements Serializable {
@@ -23,6 +25,7 @@ public class FileCopyOperation extends FileOperation implements Serializable {
     private final boolean renameFiles;
     private final String sourceCaptureExpression;
     private final String targetNameExpression;
+    private Boolean useDefaultExcludes;
 
     @DataBoundConstructor
     public FileCopyOperation(String includes,
@@ -39,6 +42,7 @@ public class FileCopyOperation extends FileOperation implements Serializable {
         this.renameFiles = renameFiles;
         this.sourceCaptureExpression = sourceCaptureExpression;
         this.targetNameExpression = targetNameExpression;
+        this.useDefaultExcludes = true;
     }
 
     public String getIncludes() {
@@ -69,6 +73,10 @@ public class FileCopyOperation extends FileOperation implements Serializable {
         return targetNameExpression;
     }
 
+    public boolean getUseDefaultExcludes() {
+        return useDefaultExcludes;
+    }
+
     public boolean runOperation(Run<?, ?> run, FilePath buildWorkspace, Launcher launcher, TaskListener listener) {
         boolean result = false;
         try {
@@ -83,7 +91,8 @@ public class FileCopyOperation extends FileOperation implements Serializable {
                                                        flattenFiles,
                                                        renameFiles,
                                                        sourceCaptureExpression,
-                                                       targetNameExpression));
+                                                       targetNameExpression,
+                                                       useDefaultExcludes));
             } catch (RuntimeException e) {
                 listener.getLogger().println(e.getMessage());
                 throw e;
@@ -108,6 +117,7 @@ public class FileCopyOperation extends FileOperation implements Serializable {
         private final boolean renameFiles;
         private final String sourceCaptureExpression;
         private final String targetNameExpression;
+        private final boolean useDefaultExcludes;
 
         public TargetFileCallable(TaskListener Listener,
                                   String ResolvedIncludes,
@@ -116,7 +126,8 @@ public class FileCopyOperation extends FileOperation implements Serializable {
                                   boolean flattenFiles,
                                   boolean renameFiles,
                                   String sourceCaptureExpression,
-                                  String targetNameExpression) {
+                                  String targetNameExpression,
+                                  boolean UseDefaultExcludes) {
             this.listener = Listener;
             this.resolvedIncludes = ResolvedIncludes;
             this.resolvedExcludes = ResolvedExcludes;
@@ -125,6 +136,7 @@ public class FileCopyOperation extends FileOperation implements Serializable {
             this.renameFiles = renameFiles;
             this.sourceCaptureExpression = sourceCaptureExpression;
             this.targetNameExpression = targetNameExpression;
+            this.useDefaultExcludes = UseDefaultExcludes;
         }
 
         @Override
@@ -133,7 +145,7 @@ public class FileCopyOperation extends FileOperation implements Serializable {
             try {
                 FilePath fpWS = new FilePath(ws);
                 FilePath fpTL = new FilePath(fpWS, resolvedTargetLocation);
-                FilePath[] resolvedFiles = fpWS.list(resolvedIncludes, resolvedExcludes);
+                FilePath[] resolvedFiles = fpWS.list(resolvedIncludes, resolvedExcludes, useDefaultExcludes);
                 if (resolvedFiles.length == 0) {
                     listener.getLogger().println("0 files found for include pattern '" + resolvedIncludes + "' and exclude pattern '" + resolvedExcludes + "'");
                 }
@@ -158,7 +170,7 @@ public class FileCopyOperation extends FileOperation implements Serializable {
                     for (FilePath item : resolvedFiles) {
                         listener.getLogger().println(item.getRemote());
                     }
-                    fpWS.copyRecursiveTo(resolvedIncludes, resolvedExcludes, fpTL);
+                    fpWS.copyRecursiveTo(new DirScanner.Glob(resolvedIncludes, resolvedExcludes, useDefaultExcludes), fpTL, resolvedIncludes);
                     result = true;
                 }
             } catch (RuntimeException e) {
@@ -183,6 +195,17 @@ public class FileCopyOperation extends FileOperation implements Serializable {
         public String getDisplayName() {
             return "File Copy";
         }
+    }
 
+    @DataBoundSetter
+    public void setUseDefaultExcludes(boolean useDefaultExcludes) {
+        this.useDefaultExcludes = useDefaultExcludes;
+    }
+
+    protected Object readResolve() {
+        if (useDefaultExcludes == null) {
+            useDefaultExcludes = true;
+        }
+        return this;
     }
 }
