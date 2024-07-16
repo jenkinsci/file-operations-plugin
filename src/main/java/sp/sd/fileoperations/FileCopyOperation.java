@@ -143,7 +143,9 @@ public class FileCopyOperation extends FileOperation implements Serializable {
                 if (flattenFiles) {
                     for (FilePath item : resolvedFiles) {
                         if (renameFiles) {
-                            String targetFileName = item.getRemote().replaceAll(sourceCaptureExpression, targetNameExpression);
+                            String targetFileName = item.getRemote()
+                                    .replace(fpWS.getRemote(), ".")
+                                    .replaceAll(sourceCaptureExpression, targetNameExpression);
                             FilePath fpTF = new FilePath(fpTL, targetFileName);
                             listener.getLogger().println("Copy from " + item.getRemote() + " to " + fpTF);
                             item.copyTo(fpTF);

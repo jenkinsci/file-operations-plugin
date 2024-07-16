@@ -1,6 +1,32 @@
 <div>
-    Java-style regular expression that is run against the full path of each
+    Java-style regular expression that is run against the workspace relative path of each
     matching source file. This should be used to capture parts of the path that
     will be used in the target name expression to make each file name unique
     across all subdirectories.
+    If the includes path is not handled within the regex the sub-directory structure will be preserved.
+    <p>
+        <strong>Example:</strong><br/>
+        <code>
+        <pre>
+            // folllowing structure:
+            // dir1/info-app.txt
+            // dir1/error-app.txt
+            fileOperations([fileCopyOperation(
+                includes: '**/dir1/*.txt',
+                targetLocation: 'logs/',
+                flattenFiles: true,
+                renameFiles: true,
+                sourceCaptureExpression: 'dir1/(.*)-app\\.txt$',
+                targetNameExpression: '$1.log')
+            ])
+        </pre>
+        </code>
+         will result in:
+        <code>
+        <pre>
+            logs/info.log
+            logs/error.log
+        </pre>
+        </code>
+    </p>
 </div>

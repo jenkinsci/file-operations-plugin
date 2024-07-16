@@ -11,7 +11,6 @@ import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.WithoutJenkins;
 
-import hudson.FilePath;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
@@ -97,5 +96,33 @@ public class FileCopyOperationTest {
         assertTrue(build.getWorkspace().child("test-results/0-TestB.xml").exists());
         assertTrue(build.getWorkspace().child("test-results/1-TestB.xml").exists());
         assertTrue(build.getWorkspace().child("test-results/1-TestC.xml").exists());
+    }
+
+    /**
+     * @see "help-sourceCaptureExpression.html"
+     */
+    @Test
+    public void testFileCopyOperationForSourceCaptureExpressionExample() throws Exception {
+        FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
+        List<FileOperation> fop = new ArrayList<>();
+        fop.add(new FileCreateOperation("dir1/info-app.txt", ""));
+        fop.add(new FileCreateOperation("dir1/error-app.txt", ""));
+
+        // Required to handle test being run on either Windows or Unix systems
+        String dirSep = "(?:\\\\|/)";
+
+        fop.add(new FileCopyOperation(
+                "**/dir1/*.txt",
+                "",
+                "logs",
+                true,
+                true,
+                "dir1" + dirSep + "(.*)-app\\.txt$",
+                "$1.log"));
+        p1.getBuildersList().add(new FileOperationsBuilder(fop));
+        FreeStyleBuild build = p1.scheduleBuild2(0).get();
+        assertEquals(Result.SUCCESS, build.getResult());
+        assertTrue(build.getWorkspace().child("logs/info.log").exists());
+        assertTrue(build.getWorkspace().child("logs/error.log").exists());
     }
 }
