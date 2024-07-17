@@ -1,21 +1,18 @@
 package sp.sd.fileoperations;
 
 import hudson.EnvVars;
-import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
-import hudson.model.TaskListener;
+import hudson.FilePath.FileCallable;
+import hudson.Launcher;
 import hudson.model.Run;
-
+import hudson.model.TaskListener;
+import hudson.remoting.VirtualChannel;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.File;
-
-import hudson.FilePath.FileCallable;
-import hudson.remoting.VirtualChannel;
-import org.jenkinsci.remoting.RoleChecker;
-
 import java.io.Serializable;
 
 public class FileCopyOperation extends FileOperation implements Serializable {
@@ -143,7 +140,11 @@ public class FileCopyOperation extends FileOperation implements Serializable {
                 if (flattenFiles) {
                     for (FilePath item : resolvedFiles) {
                         if (renameFiles) {
-                            String targetFileName = item.getRemote().replaceAll(sourceCaptureExpression, targetNameExpression);
+                            final String relativePath = item.getRemote()
+                                    .replace(fpWS.getRemote(), ".");
+                            final String relativeTargetFileName = relativePath
+                                    .replaceAll(sourceCaptureExpression, targetNameExpression);
+                            final String targetFileName = relativePath.equals(relativeTargetFileName) ? item.getName() : relativeTargetFileName;
                             FilePath fpTF = new FilePath(fpTL, targetFileName);
                             listener.getLogger().println("Copy from " + item.getRemote() + " to " + fpTF);
                             item.copyTo(fpTF);
