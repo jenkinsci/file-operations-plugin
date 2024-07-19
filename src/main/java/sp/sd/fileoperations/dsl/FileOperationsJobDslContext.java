@@ -35,20 +35,44 @@ public class FileOperationsJobDslContext implements Context {
                                   boolean flattenFiles,
                                   boolean renameFiles,
                                   String sourceCaptureExpression,
-                                  String targetNameExpression) {
+                                  String targetNameExpression,
+                                  boolean useDefaultExcludes) {
         FileCopyOperation fileCopyOperation = new FileCopyOperation(includes,
-                                                                    excludes,
-                                                                    targetLocation,
-                                                                    flattenFiles,
-                                                                    renameFiles,
-                                                                    sourceCaptureExpression,
-                                                                    targetNameExpression);
+                excludes,
+                targetLocation,
+                flattenFiles,
+                renameFiles,
+                sourceCaptureExpression,
+                targetNameExpression);
+        fileCopyOperation.setUseDefaultExcludes(useDefaultExcludes);
         fileOperations.add(fileCopyOperation);
     }
 
-    public void fileDeleteOperation(String includes, String excludes) {
+    public void fileCopyOperation(String includes,
+                                  String excludes,
+                                  String targetLocation,
+                                  boolean flattenFiles,
+                                  boolean renameFiles,
+                                  String sourceCaptureExpression,
+                                  String targetNameExpression) {
+        fileCopyOperation(includes,
+                          excludes,
+                          targetLocation,
+                          flattenFiles,
+                          renameFiles,
+                          sourceCaptureExpression,
+                          targetNameExpression,
+                          true);
+    }
+
+    public void fileDeleteOperation(String includes, String excludes, boolean useDefaultExcludes) {
         FileDeleteOperation fileDeleteOperation = new FileDeleteOperation(includes, excludes);
+        fileDeleteOperation.setUseDefaultExcludes(useDefaultExcludes);
         fileOperations.add(fileDeleteOperation);
+    }
+
+    public void fileDeleteOperation(String includes, String excludes) {
+        fileDeleteOperation(includes, excludes, true);
     }
 
     public void fileDownloadOperation(String url, String userName, String password, String targetLocation, String targetFileName, String proxyHost, String proxyPort) {
@@ -66,9 +90,14 @@ public class FileOperationsJobDslContext implements Context {
         fileOperations.add(filePropertiesToJsonOperation);
     }
 
-    public void fileTransformOperation(String includes, String excludes) {
+    public void fileTransformOperation(String includes, String excludes, boolean useDefaultExcludes) {
         FileTransformOperation fileTransformOperation = new FileTransformOperation(includes, excludes);
+        fileTransformOperation.setUseDefaultExcludes(useDefaultExcludes);
         fileOperations.add(fileTransformOperation);
+    }
+
+    public void fileTransformOperation(String includes, String excludes) {
+        fileTransformOperation(includes, excludes, true);
     }
 
     public void fileUnTarOperation(String filePath, String targetLocation, boolean isGZIP) {

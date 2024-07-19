@@ -1,11 +1,15 @@
 package sp.sd.fileoperations;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.security.AnyTypePermission;
 import org.junit.Rule;
 import org.junit.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -30,19 +34,25 @@ public class FileCopyOperationTest {
         assertEquals(false, fco.getRenameFiles());
         assertEquals(null, fco.getSourceCaptureExpression());
         assertEquals(null, fco.getTargetNameExpression());
+        assertEquals(true, fco.getUseDefaultExcludes());
     }
 
     @Test
     public void testRunFileOperationWithFileOperationBuildStepNoFlatten() throws Exception {
-        FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
+        // Given
         List<FileOperation> fop = new ArrayList<>();
         fop.add(new FileCreateOperation("test-results-xml/pod-0/classA/TestA.xml", ""));
         fop.add(new FileCreateOperation("test-results-xml/pod-0/classB/TestB.xml", ""));
         fop.add(new FileCreateOperation("test-results-xml/pod-1/classB/TestB.xml", ""));
         fop.add(new FileCreateOperation("test-results-xml/pod-1/classC/TestC.xml", ""));
         fop.add(new FileCopyOperation("test-results-xml/**/*.xml", "", "test-results", false, false, null, null));
+
+        // When
+        FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
         p1.getBuildersList().add(new FileOperationsBuilder(fop));
         FreeStyleBuild build = p1.scheduleBuild2(0).get();
+
+        // Then
         assertEquals(Result.SUCCESS, build.getResult());
         assertTrue(build.getWorkspace().child("test-results/test-results-xml/pod-0/classA/TestA.xml").exists());
         assertTrue(build.getWorkspace().child("test-results/test-results-xml/pod-0/classB/TestB.xml").exists());
@@ -53,15 +63,20 @@ public class FileCopyOperationTest {
     
     @Test
     public void testRunFileOperationWithFileOperationBuildStepWithFlatten() throws Exception {
-        FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
+        // Given
         List<FileOperation> fop = new ArrayList<>();
         fop.add(new FileCreateOperation("test-results-xml/pod-0/classA/TestA.xml", ""));
         fop.add(new FileCreateOperation("test-results-xml/pod-0/classB/TestB.xml", ""));
         fop.add(new FileCreateOperation("test-results-xml/pod-1/classB/TestB.xml", ""));
         fop.add(new FileCreateOperation("test-results-xml/pod-1/classC/TestC.xml", ""));
         fop.add(new FileCopyOperation("test-results-xml/**/*.xml", "", "test-results", true, false, null, null));
+
+        // When
+        FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
         p1.getBuildersList().add(new FileOperationsBuilder(fop));
         FreeStyleBuild build = p1.scheduleBuild2(0).get();
+
+        // Then
         assertEquals(Result.SUCCESS, build.getResult());
         assertTrue(build.getWorkspace().child("test-results/TestA.xml").exists());
         assertTrue(build.getWorkspace().child("test-results/TestB.xml").exists());
@@ -70,16 +85,15 @@ public class FileCopyOperationTest {
 
     @Test
     public void testRunFileOperationWithFileOperationBuildStepWithFlattenAndRename() throws Exception {
-        FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
+        // Required to handle test being run on either Windows or Unix systems
+        String dirSep = "(?:\\\\|/)";
+
+        // Given
         List<FileOperation> fop = new ArrayList<>();
         fop.add(new FileCreateOperation("test-results-xml/pod-0/classA/TestA.xml", ""));
         fop.add(new FileCreateOperation("test-results-xml/pod-0/classB/TestB.xml", ""));
         fop.add(new FileCreateOperation("test-results-xml/pod-1/classB/TestB.xml", ""));
         fop.add(new FileCreateOperation("test-results-xml/pod-1/classC/TestC.xml", ""));
-
-        // Required to handle test being run on either Windows or Unix systems
-        String dirSep = "(?:\\\\|/)";
-
         fop.add(new FileCopyOperation(
                 "test-results-xml/**/*.xml",
                 "",
@@ -89,8 +103,13 @@ public class FileCopyOperationTest {
                 ".*" + dirSep + "test-results-xml" + dirSep + ".*-([\\d]+)" +
                         dirSep + ".*" + dirSep + "([^" + dirSep + "]+)$",
                 "$1-$2"));
+
+        // When
+        FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
         p1.getBuildersList().add(new FileOperationsBuilder(fop));
         FreeStyleBuild build = p1.scheduleBuild2(0).get();
+
+        // Then
         assertEquals(Result.SUCCESS, build.getResult());
         assertTrue(build.getWorkspace().child("test-results/0-TestA.xml").exists());
         assertTrue(build.getWorkspace().child("test-results/0-TestB.xml").exists());
@@ -103,14 +122,13 @@ public class FileCopyOperationTest {
      */
     @Test
     public void testFileCopyOperationForSourceCaptureExpressionExample() throws Exception {
-        FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
-        List<FileOperation> fop = new ArrayList<>();
-        fop.add(new FileCreateOperation("dir1/info-app.txt", ""));
-        fop.add(new FileCreateOperation("dir1/error-app.txt", ""));
-
         // Required to handle test being run on either Windows or Unix systems
         String dirSep = "(?:\\\\|/)";
 
+        // Given
+        List<FileOperation> fop = new ArrayList<>();
+        fop.add(new FileCreateOperation("dir1/info-app.txt", ""));
+        fop.add(new FileCreateOperation("dir1/error-app.txt", ""));
         fop.add(new FileCopyOperation(
                 "**/dir1/*.txt",
                 "",
@@ -119,8 +137,13 @@ public class FileCopyOperationTest {
                 true,
                 "dir1" + dirSep + "(.*)-app\\.txt$",
                 "$1.log"));
+
+        // When
+        FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
         p1.getBuildersList().add(new FileOperationsBuilder(fop));
         FreeStyleBuild build = p1.scheduleBuild2(0).get();
+
+        // Then
         assertEquals(Result.SUCCESS, build.getResult());
         assertTrue(build.getWorkspace().child("logs/info.log").exists());
         assertTrue(build.getWorkspace().child("logs/error.log").exists());
@@ -133,12 +156,11 @@ public class FileCopyOperationTest {
      */
     @Test
     public void testFileCopyOperationWithFlattenAndRenameFileWithoutMatchingRegex() throws Exception {
-        FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
+        // Given
         List<FileOperation> fop = new ArrayList<>();
         fop.add(new FileCreateOperation("test-results-xml/pod-0/classA/TestA.xml", ""));
         fop.add(new FileCreateOperation("test-results-xml/pod-0/classA/Test-rename-A.xml", ""));
         fop.add(new FileCreateOperation("test-results-xml/pod-1/classB/TestB.xml", ""));
-
         fop.add(new FileCopyOperation(
                 "test-results-xml/**/*.xml",
                 "",
@@ -147,11 +169,100 @@ public class FileCopyOperationTest {
                 true,
                 ".*Test-rename-(.*)\\.xml$",
                 "Test$1.log"));
+
+        // When
+        FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
         p1.getBuildersList().add(new FileOperationsBuilder(fop));
         FreeStyleBuild build = p1.scheduleBuild2(0).get();
+
+        // Then
         assertEquals(Result.SUCCESS, build.getResult());
         assertTrue(build.getWorkspace().child("test-results/TestA.xml").exists());
         assertTrue(build.getWorkspace().child("test-results/TestA.log").exists());
         assertTrue(build.getWorkspace().child("test-results/TestB.xml").exists());
+    }
+
+    @Test
+    public void testRunFileOperationWithFileOperationBuildStepWithDefaultExcludes() throws Exception {
+        // Given
+        FileCreateOperation fileCreateOperation = new FileCreateOperation(".gitignore", "");
+        FileCopyOperation fileCopyOperation = new FileCopyOperation(".gitignore", "", "output", false, false, null, null);
+        List<FileOperation> fop = Arrays.asList(fileCreateOperation, fileCopyOperation);
+
+        // When
+        FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
+        p1.getBuildersList().add(new FileOperationsBuilder(fop));
+        FreeStyleBuild build = p1.scheduleBuild2(0).get();
+
+        // Then
+        assertEquals(Result.SUCCESS, build.getResult());
+        assertTrue(build.getWorkspace().child(".gitignore").exists());
+        assertFalse(build.getWorkspace().child("output/.gitignore").exists());
+    }
+
+    @Test
+    public void testRunFileOperationWithFileOperationBuildStepWithoutDefaultExcludes() throws Exception {
+        // Given
+        FileCreateOperation fileCreateOperation = new FileCreateOperation(".gitignore", "");
+        FileCopyOperation fileCopyOperation = new FileCopyOperation(".gitignore", "", "output", false, false, null, null);
+        fileCopyOperation.setUseDefaultExcludes(false);
+        List<FileOperation> fop = Arrays.asList(fileCreateOperation, fileCopyOperation);
+
+        // When
+        FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
+        p1.getBuildersList().add(new FileOperationsBuilder(fop));
+        FreeStyleBuild build = p1.scheduleBuild2(0).get();
+
+        // Then
+        assertEquals(Result.SUCCESS, build.getResult());
+        assertTrue(build.getWorkspace().child(".gitignore").exists());
+        assertTrue(build.getWorkspace().child("output/.gitignore").exists());
+    }
+
+    @Test
+    @WithoutJenkins
+    public void testSerializeWithXStream() {
+        // Given
+        FileCopyOperation originalObject = new FileCopyOperation("include", "exclude", "output", false, false, null, null);
+        originalObject.setUseDefaultExcludes(false);
+
+        // When
+        XStream xstream = new XStream();
+        xstream.addPermission(AnyTypePermission.ANY);
+        String serializedObjectXml = xstream.toXML(originalObject);
+        FileCopyOperation deserializedObject = (FileCopyOperation)xstream.fromXML(serializedObjectXml);
+
+        // Then
+        assertEquals(originalObject.getIncludes(), deserializedObject.getIncludes());
+        assertEquals(originalObject.getExcludes(), deserializedObject.getExcludes());
+        assertEquals(originalObject.getTargetLocation(), deserializedObject.getTargetLocation());
+        assertEquals(originalObject.getFlattenFiles(), deserializedObject.getFlattenFiles());
+        assertEquals(originalObject.getRenameFiles(), deserializedObject.getRenameFiles());
+        assertEquals(originalObject.getSourceCaptureExpression(), deserializedObject.getSourceCaptureExpression());
+        assertEquals(originalObject.getTargetNameExpression(), deserializedObject.getTargetNameExpression());
+        assertEquals(originalObject.getUseDefaultExcludes(), deserializedObject.getUseDefaultExcludes());
+    }
+
+    @Test
+    @WithoutJenkins
+    public void testSerializeWithXStreamBackwardsCompatibility() {
+        // Given
+        String serializedObjectXml =
+                "<FileCopyOperation>" +
+                "  <includes>include</includes>" +
+                "  <excludes>exclude</excludes>" +
+                "  <targetLocation>output</targetLocation>" +
+                "  <flattenFiles>false</flattenFiles>" +
+                "  <renameFiles>false</renameFiles>" +
+                "</FileCopyOperation>";
+
+        // When
+        XStream xstream = new XStream();
+        xstream.alias("FileCopyOperation", FileCopyOperation.class);
+        xstream.addPermission(AnyTypePermission.ANY);
+        FileCopyOperation deserializedObject = (FileCopyOperation)xstream.fromXML(serializedObjectXml);
+
+        // Then
+        assertTrue(deserializedObject.getUseDefaultExcludes());
     }
 }

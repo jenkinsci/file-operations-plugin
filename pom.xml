@@ -70,6 +70,12 @@
             <version>1.87</version>
             <optional>true</optional>
         </dependency>
+        <dependency>
+            <groupId>com.thoughtworks.xstream</groupId>
+            <artifactId>xstream</artifactId>
+            <version>1.4.20</version>
+            <scope>test</scope>
+        </dependency>
     </dependencies>
 
     <repositories>

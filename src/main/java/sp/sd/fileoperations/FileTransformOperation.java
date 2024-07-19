@@ -9,6 +9,7 @@ import hudson.model.TaskListener;
 
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
+import org.kohsuke.stapler.DataBoundSetter;
 
 import java.io.File;
 
@@ -21,11 +22,13 @@ import java.io.Serializable;
 public class FileTransformOperation extends FileOperation implements Serializable {
     private final String includes;
     private final String excludes;
+    private Boolean useDefaultExcludes;
 
     @DataBoundConstructor
     public FileTransformOperation(String includes, String excludes) {
         this.includes = includes;
         this.excludes = excludes;
+        this.useDefaultExcludes = true;
     }
 
     public String getIncludes() {
@@ -36,6 +39,10 @@ public class FileTransformOperation extends FileOperation implements Serializabl
         return excludes;
     }
 
+    public boolean getUseDefaultExcludes() {
+        return useDefaultExcludes;
+    }
+
     public boolean runOperation(Run<?, ?> run, FilePath buildWorkspace, Launcher launcher, TaskListener listener) {
         boolean result = false;
         try {
@@ -43,7 +50,7 @@ public class FileTransformOperation extends FileOperation implements Serializabl
             EnvVars envVars = run.getEnvironment(listener);
             try {
                 FilePath ws = new FilePath(buildWorkspace, ".");
-                result = ws.act(new TargetFileCallable(listener, envVars.expand(includes), envVars.expand(excludes), envVars));
+                result = ws.act(new TargetFileCallable(listener, envVars.expand(includes), envVars.expand(excludes), useDefaultExcludes, envVars));
             } catch (Exception e) {
                 listener.fatalError(e.getMessage());
                 return false;
@@ -61,11 +68,13 @@ public class FileTransformOperation extends FileOperation implements Serializabl
         private final EnvVars environment;
         private final String resolvedIncludes;
         private final String resolvedExcludes;
+        private final boolean useDefaultExcludes;
 
-        public TargetFileCallable(TaskListener Listener, String ResolvedIncludes, String ResolvedExcludes, EnvVars environment) {
+        public TargetFileCallable(TaskListener Listener, String ResolvedIncludes, String ResolvedExcludes, boolean UseDefaultExcludes, EnvVars environment) {
             this.listener = Listener;
             this.resolvedIncludes = ResolvedIncludes;
             this.resolvedExcludes = ResolvedExcludes;
+            this.useDefaultExcludes = UseDefaultExcludes;
             this.environment = environment;
         }
 
@@ -74,7 +83,7 @@ public class FileTransformOperation extends FileOperation implements Serializabl
             boolean result = false;
             try {
                 FilePath fpWS = new FilePath(ws);
-                FilePath[] resolvedFiles = fpWS.list(resolvedIncludes, resolvedExcludes);
+                FilePath[] resolvedFiles = fpWS.list(resolvedIncludes, resolvedExcludes, useDefaultExcludes);
                 if (resolvedFiles.length == 0) {
                     listener.getLogger().println("0 files found for include pattern '" + resolvedIncludes + "' and exclude pattern '" + resolvedExcludes + "'");
                     result = true;
@@ -109,6 +118,17 @@ public class FileTransformOperation extends FileOperation implements Serializabl
         public String getDisplayName() {
             return "File Transform";
         }
+    }
 
+    @DataBoundSetter
+    public void setUseDefaultExcludes(boolean useDefaultExcludes) {
+        this.useDefaultExcludes = useDefaultExcludes;
+    }
+
+    protected Object readResolve() {
+        if (useDefaultExcludes == null) {
+            useDefaultExcludes = true;
+        }
+        return this;
     }
 }
