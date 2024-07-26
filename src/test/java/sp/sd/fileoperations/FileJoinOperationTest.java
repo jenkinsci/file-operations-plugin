@@ -32,23 +32,18 @@ public class FileJoinOperationTest {
     public void testRunFileJoinOperation() throws Exception {
         FreeStyleProject project = jenkins.createFreeStyleProject("fileJoinTest");
 
-        // Setup source file content
         FilePath sourceFile = new FilePath(jenkins.jenkins.getWorkspaceFor(project), "source.txt");
         sourceFile.write("Source File Content", StandardCharsets.UTF_8.name());
 
-        // Setup target file content
         FilePath targetFile = new FilePath(jenkins.jenkins.getWorkspaceFor(project), "target.txt");
         targetFile.write("Target File Content", StandardCharsets.UTF_8.name());
 
-        // Add FileJoinOperation to project
         FileJoinOperation fileJoinOp = new FileJoinOperation("source.txt", "target.txt");
         project.getBuildersList().add(new FileOperationsBuilder(List.of(fileJoinOp)));
 
-        // Run the build
         FreeStyleBuild build = project.scheduleBuild2(0).get();
         assertEquals(Result.SUCCESS, build.getResult());
 
-        // Verify file join
         String expectedContent = "Target File Content\nSource File Content";
         String actualContent = targetFile.readToString();
         assertEquals(expectedContent, actualContent);
@@ -56,7 +51,6 @@ public class FileJoinOperationTest {
 
     @Test
     public void testRunFileJoinOperationWithTokens() throws Exception {
-        // Setup environment variables
         EnvironmentVariablesNodeProperty prop = new EnvironmentVariablesNodeProperty();
         EnvVars envVars = prop.getEnvVars();
         envVars.put("SOURCE_FILE", "source.txt");
@@ -65,23 +59,18 @@ public class FileJoinOperationTest {
 
         FreeStyleProject project = jenkins.createFreeStyleProject("fileJoinTestWithTokens");
 
-        // Setup source file content
         FilePath sourceFile = new FilePath(jenkins.jenkins.getWorkspaceFor(project), "source.txt");
         sourceFile.write("Source File Content", StandardCharsets.UTF_8.name());
 
-        // Setup target file content
         FilePath targetFile = new FilePath(jenkins.jenkins.getWorkspaceFor(project), "target.txt");
         targetFile.write("Target File Content", StandardCharsets.UTF_8.name());
 
-        // Add FileJoinOperation to project
         FileJoinOperation fileJoinOp = new FileJoinOperation("$SOURCE_FILE", "$TARGET_FILE");
         project.getBuildersList().add(new FileOperationsBuilder(List.of(fileJoinOp)));
 
-        // Run the build
         FreeStyleBuild build = project.scheduleBuild2(0).get();
         assertEquals(Result.SUCCESS, build.getResult());
 
-        // Verify file join
         String expectedContent = "Target File Content\nSource File Content";
         String actualContent = targetFile.readToString();
         assertEquals(expectedContent, actualContent);
