@@ -44,7 +44,7 @@ public class FileJoinOperationTest {
         FreeStyleBuild build = project.scheduleBuild2(0).get();
         assertEquals(Result.SUCCESS, build.getResult());
 
-        String expectedContent = "Target File Content\nSource File Content";
+        String expectedContent = "Target File Content" + System.lineSeparator() + "Source File Content";
         String actualContent = targetFile.readToString();
         assertEquals(expectedContent, actualContent);
     }
@@ -71,7 +71,7 @@ public class FileJoinOperationTest {
         FreeStyleBuild build = project.scheduleBuild2(0).get();
         assertEquals(Result.SUCCESS, build.getResult());
 
-        String expectedContent = "Target File Content\nSource File Content";
+        String expectedContent = "Target File Content" + System.lineSeparator() + "Source File Content";
         String actualContent = targetFile.readToString();
         assertEquals(expectedContent, actualContent);
     }
