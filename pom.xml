@@ -24,14 +24,6 @@
         </license>
     </licenses>
 
-    <developers>
-        <developer>
-            <id>pskumar448</id>
-            <name>Suresh Kumar</name>
-            <email>pskumar448@gmail.com</email>
-        </developer>
-    </developers>
-
     <scm>
         <connection>scm:git:https://github.com/${gitHubRepo}.git</connection>
         <developerConnection>scm:git:git@github.com:${gitHubRepo}.git</developerConnection>
@@ -42,13 +34,14 @@
     <properties>
         <changelist>999999-SNAPSHOT</changelist>
         <gitHubRepo>jenkinsci/file-operations-plugin</gitHubRepo>
-        <jenkins.version>2.462.3</jenkins.version>
+        <jenkins.baseline>2.462</jenkins.baseline>
+        <jenkins.version>${jenkins.baseline}.3</jenkins.version>
     </properties>
     <dependencyManagement>
         <dependencies>
             <dependency>
                 <groupId>io.jenkins.tools.bom</groupId>
-                <artifactId>bom-2.462.x</artifactId>
+                <artifactId>bom-${jenkins.baseline}.x</artifactId>
                 <version>3482.vc10d4f6da_28a_</version>
                 <type>pom</type>
                 <scope>import</scope>
