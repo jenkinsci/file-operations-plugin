@@ -1,5 +1,6 @@
 package sp.sd.fileoperations;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.EnvVars;
 import hudson.Launcher;
 import hudson.Extension;
@@ -8,7 +9,10 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 
 import hudson.util.Secret;
-import org.apache.http.impl.client.*;
+
+import org.apache.hc.client5.http.auth.AuthCache;
+import org.apache.hc.client5.http.impl.DefaultRedirectStrategy;
+import org.apache.hc.client5.http.impl.classic.*;
 import org.jenkinsci.Symbol;
 import org.kohsuke.stapler.DataBoundConstructor;
 
@@ -20,19 +24,19 @@ import java.io.OutputStream;
 
 import hudson.FilePath.FileCallable;
 import hudson.remoting.VirtualChannel;
-import org.apache.http.HttpEntity;
-import org.apache.http.HttpHost;
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.AuthCache;
-import org.apache.http.client.CredentialsProvider;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.protocol.HttpClientContext;
-import org.apache.http.impl.auth.BasicScheme;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.HttpStatus;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.client5.http.impl.auth.BasicScheme;
 import org.jenkinsci.remoting.RoleChecker;
 
+import java.io.Serial;
 import java.io.Serializable;
 import java.net.URI;
 
@@ -114,6 +118,7 @@ public class FileDownloadOperation extends FileOperation implements Serializable
     }
 
     private static final class TargetFileCallable implements FileCallable<Boolean> {
+        @Serial
         private static final long serialVersionUID = 1;
         private final TaskListener listener;
         private final String resolvedUrl;
@@ -137,17 +142,16 @@ public class FileDownloadOperation extends FileOperation implements Serializable
 
         @Override
         public Boolean invoke(File ws, VirtualChannel channel) {
-            boolean result;
             try {
                 FilePath fpWS = new FilePath(ws);
                 FilePath fpTL = new FilePath(fpWS, resolvedTargetLocation);
                 FilePath fpTLF = new FilePath(fpTL, resolvedTargetFileName);
                 File fTarget = new File(fpTLF.toURI());
-                URI Url = new URI(resolvedUrl);
+                URI uri = new URI(resolvedUrl);
                 listener.getLogger().println("Started downloading file from " + resolvedUrl);
-                HttpHost host = new HttpHost(Url.getHost(), Url.getPort(), Url.getScheme());
-                CredentialsProvider credsProvider = new BasicCredentialsProvider();
-                credsProvider.setCredentials(new AuthScope(Url.getHost(), Url.getPort()), new UsernamePasswordCredentials(resolvedUserName, resolvedPassword));
+                HttpHost host = new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort());
+                BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
+                credsProvider.setCredentials(new AuthScope(uri.getHost(), uri.getPort()), new UsernamePasswordCredentials(resolvedUserName, resolvedPassword.toCharArray()));
                 AuthCache authCache = new BasicAuthCache();
                 BasicScheme basicAuth = new BasicScheme();
                 authCache.put(host, basicAuth);
@@ -160,31 +164,32 @@ public class FileDownloadOperation extends FileOperation implements Serializable
                     HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort));
                     httpClientBuilder.setProxy(proxy);
                 }
-                CloseableHttpClient httpClient = httpClientBuilder.setRedirectStrategy(new LaxRedirectStrategy()).build();
-                HttpGet httpGet = new HttpGet(Url);
+
+                CloseableHttpClient httpClient = httpClientBuilder.setRedirectStrategy(DefaultRedirectStrategy.INSTANCE).build();
+                HttpGet httpGet = new HttpGet(uri);
                 HttpClientContext localContext = HttpClientContext.create();
                 if (!resolvedUserName.isEmpty() && !resolvedPassword.isEmpty()) {
                     localContext.setAuthCache(authCache);
                 }
-                HttpResponse response = httpClient.execute(host, httpGet, localContext);
-                HttpEntity entity = response.getEntity();
-                try (OutputStream fosTarget = new FileOutputStream(fTarget)) {
-                    if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-                        result = false;
-                    } else {
-                        entity.writeTo(fosTarget);
-                        result = true;
-                        listener.getLogger().println("Completed downloading file.");
+                return httpClient.execute(host, httpGet, localContext, response -> {
+                    HttpEntity entity = response.getEntity();
+                    try (OutputStream fosTarget = new FileOutputStream(fTarget)) {
+                        if (response.getCode() != HttpStatus.SC_OK) {
+                            return false;
+                        } else {
+                            entity.writeTo(fosTarget);
+                            listener.getLogger().println("Completed downloading file.");
+                            return true;
+                        }
                     }
-                }
+                });
             } catch (RuntimeException e) {
                 listener.fatalError(e.getMessage());
                 throw e;
             } catch (Exception e) {
                 listener.fatalError(e.getMessage());
-                result = false;
+                return false;
             }
-            return result;
         }
 
         @Override
@@ -196,6 +201,8 @@ public class FileDownloadOperation extends FileOperation implements Serializable
     @Extension
     @Symbol("fileDownloadOperation")
     public static class DescriptorImpl extends FileOperationDescriptor {
+        @NonNull
+        @Override
         public String getDisplayName() {
             return "File Download";
         }
