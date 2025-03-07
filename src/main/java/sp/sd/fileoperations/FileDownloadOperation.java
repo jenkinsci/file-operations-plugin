@@ -151,9 +151,11 @@ public class FileDownloadOperation extends FileOperation implements Serializable
                 listener.getLogger().println("Started downloading file from " + resolvedUrl);
                 HttpHost host = new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort());
                 BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
-                credsProvider.setCredentials(new AuthScope(uri.getHost(), uri.getPort()), new UsernamePasswordCredentials(resolvedUserName, resolvedPassword.toCharArray()));
+                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(resolvedUserName, resolvedPassword.toCharArray());
+                credsProvider.setCredentials(new AuthScope(uri.getHost(), uri.getPort()), credentials);
                 AuthCache authCache = new BasicAuthCache();
                 BasicScheme basicAuth = new BasicScheme();
+                basicAuth.initPreemptive(credentials);
                 authCache.put(host, basicAuth);
 
                 HttpClientBuilder httpClientBuilder = HttpClients.custom()
