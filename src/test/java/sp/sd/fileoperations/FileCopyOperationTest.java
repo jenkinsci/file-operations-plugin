@@ -1,8 +1,6 @@
 package sp.sd.fileoperations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -10,35 +8,42 @@ import java.util.List;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.security.AnyTypePermission;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.WithoutJenkins;
 
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-public class FileCopyOperationTest {
-    @Rule
-    public JenkinsRule jenkins = new JenkinsRule();
+@WithJenkins
+class FileCopyOperationTest {
+
+    private JenkinsRule jenkins;
+
+    @BeforeEach
+    void setUp(JenkinsRule rule) {
+        jenkins = rule;
+    }
 
     @Test
     @WithoutJenkins
-    public void testDefaults() {
+    void testDefaults() {
         FileCopyOperation fco = new FileCopyOperation("**/*.config", "**/*.xml", "target", true, false, null, null);
         assertEquals("**/*.config", fco.getIncludes());
         assertEquals("**/*.xml", fco.getExcludes());
         assertEquals("target", fco.getTargetLocation());
-        assertEquals(true, fco.getFlattenFiles());
-        assertEquals(false, fco.getRenameFiles());
-        assertEquals(null, fco.getSourceCaptureExpression());
-        assertEquals(null, fco.getTargetNameExpression());
-        assertEquals(true, fco.getUseDefaultExcludes());
+        assertTrue(fco.getFlattenFiles());
+        assertFalse(fco.getRenameFiles());
+        assertNull(fco.getSourceCaptureExpression());
+        assertNull(fco.getTargetNameExpression());
+        assertTrue(fco.getUseDefaultExcludes());
     }
 
     @Test
-    public void testRunFileOperationWithFileOperationBuildStepNoFlatten() throws Exception {
+    void testRunFileOperationWithFileOperationBuildStepNoFlatten() throws Exception {
         // Given
         List<FileOperation> fop = new ArrayList<>();
         fop.add(new FileCreateOperation("test-results-xml/pod-0/classA/TestA.xml", ""));
@@ -60,9 +65,9 @@ public class FileCopyOperationTest {
         assertTrue(build.getWorkspace().child("test-results/test-results-xml/pod-1/classC/TestC.xml").exists());
     }
 
-    
+
     @Test
-    public void testRunFileOperationWithFileOperationBuildStepWithFlatten() throws Exception {
+    void testRunFileOperationWithFileOperationBuildStepWithFlatten() throws Exception {
         // Given
         List<FileOperation> fop = new ArrayList<>();
         fop.add(new FileCreateOperation("test-results-xml/pod-0/classA/TestA.xml", ""));
@@ -84,7 +89,7 @@ public class FileCopyOperationTest {
     }
 
     @Test
-    public void testRunFileOperationWithFileOperationBuildStepWithFlattenAndRename() throws Exception {
+    void testRunFileOperationWithFileOperationBuildStepWithFlattenAndRename() throws Exception {
         // Required to handle test being run on either Windows or Unix systems
         String dirSep = "(?:\\\\|/)";
 
@@ -121,7 +126,7 @@ public class FileCopyOperationTest {
      * @see "help-sourceCaptureExpression.html"
      */
     @Test
-    public void testFileCopyOperationForSourceCaptureExpressionExample() throws Exception {
+    void testFileCopyOperationForSourceCaptureExpressionExample() throws Exception {
         // Required to handle test being run on either Windows or Unix systems
         String dirSep = "(?:\\\\|/)";
 
@@ -155,7 +160,7 @@ public class FileCopyOperationTest {
      * @see "https://github.com/jenkinsci/file-operations-plugin/issues/101"
      */
     @Test
-    public void testFileCopyOperationWithFlattenAndRenameFileWithoutMatchingRegex() throws Exception {
+    void testFileCopyOperationWithFlattenAndRenameFileWithoutMatchingRegex() throws Exception {
         // Given
         List<FileOperation> fop = new ArrayList<>();
         fop.add(new FileCreateOperation("test-results-xml/pod-0/classA/TestA.xml", ""));
@@ -183,7 +188,7 @@ public class FileCopyOperationTest {
     }
 
     @Test
-    public void testRunFileOperationWithFileOperationBuildStepWithDefaultExcludes() throws Exception {
+    void testRunFileOperationWithFileOperationBuildStepWithDefaultExcludes() throws Exception {
         // Given
         FileCreateOperation fileCreateOperation = new FileCreateOperation(".gitignore", "");
         FileCopyOperation fileCopyOperation = new FileCopyOperation(".gitignore", "", "output", false, false, null, null);
@@ -201,7 +206,7 @@ public class FileCopyOperationTest {
     }
 
     @Test
-    public void testRunFileOperationWithFileOperationBuildStepWithoutDefaultExcludes() throws Exception {
+    void testRunFileOperationWithFileOperationBuildStepWithoutDefaultExcludes() throws Exception {
         // Given
         FileCreateOperation fileCreateOperation = new FileCreateOperation(".gitignore", "");
         FileCopyOperation fileCopyOperation = new FileCopyOperation(".gitignore", "", "output", false, false, null, null);
@@ -221,7 +226,7 @@ public class FileCopyOperationTest {
 
     @Test
     @WithoutJenkins
-    public void testSerializeWithXStream() {
+    void testSerializeWithXStream() {
         // Given
         FileCopyOperation originalObject = new FileCopyOperation("include", "exclude", "output", false, false, null, null);
         originalObject.setUseDefaultExcludes(false);
@@ -245,7 +250,7 @@ public class FileCopyOperationTest {
 
     @Test
     @WithoutJenkins
-    public void testSerializeWithXStreamBackwardsCompatibility() {
+    void testSerializeWithXStreamBackwardsCompatibility() {
         // Given
         String serializedObjectXml =
                 "<FileCopyOperation>" +

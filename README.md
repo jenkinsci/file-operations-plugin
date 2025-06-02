@@ -29,7 +29,7 @@ No need to search for *Nix or Win commands to do file operations.
 14. **File Rename** Operation
 15. **Folder Rename** Operation
 
-For more details about about each step please refer to: [File Operations Steps](https://www.jenkins.io/doc/pipeline/steps/file-operations/)
+For more details about each step please refer to: [File Operations Steps](https://www.jenkins.io/doc/pipeline/steps/file-operations/)
 
 ## Pipeline Usage Examples
 

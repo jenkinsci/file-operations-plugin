@@ -6,21 +6,27 @@ import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import java.util.List;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class FileRenameOperationTest {
+@WithJenkins
+class FileRenameOperationTest {
 
-    @Rule
-    public JenkinsRule jenkins = new JenkinsRule();
+    private JenkinsRule jenkins;
+
+    @BeforeEach
+    void setUp(JenkinsRule rule) {
+        jenkins = rule;
+    }
 
     @Test
-    public void testDefaults() {
+    void testDefaults() {
         String source = "source.txt";
         String destination = "destination.txt";
         FileRenameOperation operation = new FileRenameOperation(source, destination);
@@ -30,7 +36,7 @@ public class FileRenameOperationTest {
     }
 
     @Test
-    public void testRunFileRenameOperation() throws Exception {
+    void testRunFileRenameOperation() throws Exception {
         FreeStyleProject project = jenkins.createFreeStyleProject("fileRenameTest");
 
         FilePath workspace = jenkins.jenkins.getWorkspaceFor(project);
@@ -45,12 +51,12 @@ public class FileRenameOperationTest {
         FreeStyleBuild build = project.scheduleBuild2(0).get();
         assertEquals(Result.SUCCESS, build.getResult());
 
-        assertFalse("The source file should have been renamed", sourceFile.exists());
-        assertTrue("The destination file should exist", destinationFile.exists());
+        assertFalse(sourceFile.exists(), "The source file should have been renamed");
+        assertTrue(destinationFile.exists(), "The destination file should exist");
     }
 
     @Test
-    public void testRunFileRenameOperationWithTokens() throws Exception {
+    void testRunFileRenameOperationWithTokens() throws Exception {
         EnvironmentVariablesNodeProperty prop = new EnvironmentVariablesNodeProperty();
         EnvVars envVars = prop.getEnvVars();
         envVars.put("SOURCE_FILE", "source.txt");
@@ -71,7 +77,7 @@ public class FileRenameOperationTest {
         FreeStyleBuild build = project.scheduleBuild2(0).get();
         assertEquals(Result.SUCCESS, build.getResult());
 
-        assertFalse("The source file should have been renamed", sourceFile.exists());
-        assertTrue("The destination file should exist", destinationFile.exists());
+        assertFalse(sourceFile.exists(), "The source file should have been renamed");
+        assertTrue(destinationFile.exists(), "The destination file should exist");
     }
 }

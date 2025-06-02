@@ -1,15 +1,15 @@
 package sp.sd.fileoperations;
 
-import static org.junit.Assert.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.WithoutJenkins;
 
-public class FileOperationDescriptorTest {
+class FileOperationDescriptorTest {
 
     @Test
     @WithoutJenkins
-    public void testFileOperationDescriptor() {
+    void testFileOperationDescriptor() {
         // Test with a real implementation that exists in the codebase
         FileOperationDescriptor descriptor = new FileZipOperation.DescriptorImpl();
         assertEquals("File Zip", descriptor.getDisplayName());
