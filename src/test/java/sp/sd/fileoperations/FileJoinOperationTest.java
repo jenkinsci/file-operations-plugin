@@ -1,35 +1,42 @@
 package sp.sd.fileoperations;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.WithoutJenkins;
 
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-import static org.junit.Assert.assertEquals;
+@WithJenkins
+class FileJoinOperationTest {
 
-public class FileJoinOperationTest {
-    @Rule
-    public JenkinsRule jenkins = new JenkinsRule();
+    private JenkinsRule jenkins;
+
+    @BeforeEach
+    void setUp(JenkinsRule rule) {
+        jenkins = rule;
+    }
 
     @Test
     @WithoutJenkins
-    public void testDefaults() {
+    void testDefaults() {
         FileJoinOperation fjo = new FileJoinOperation("source.txt", "target.txt");
         assertEquals("source.txt", fjo.getSourceFile());
         assertEquals("target.txt", fjo.getTargetFile());
     }
 
     @Test
-    public void testRunFileJoinOperation() throws Exception {
+    void testRunFileJoinOperation() throws Exception {
         FreeStyleProject project = jenkins.createFreeStyleProject("fileJoinTest");
 
         FilePath sourceFile = new FilePath(jenkins.jenkins.getWorkspaceFor(project), "source.txt");
@@ -50,7 +57,7 @@ public class FileJoinOperationTest {
     }
 
     @Test
-    public void testRunFileJoinOperationWithTokens() throws Exception {
+    void testRunFileJoinOperationWithTokens() throws Exception {
         EnvironmentVariablesNodeProperty prop = new EnvironmentVariablesNodeProperty();
         EnvVars envVars = prop.getEnvVars();
         envVars.put("SOURCE_FILE", "source.txt");

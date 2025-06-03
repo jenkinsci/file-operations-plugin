@@ -6,21 +6,27 @@ import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import java.util.List;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-import static org.junit.Assert.*;
+import static org.junit.jupiter.api.Assertions.*;
 
-public class FolderRenameOperationTest {
+@WithJenkins
+class FolderRenameOperationTest {
 
-    @Rule
-    public JenkinsRule jenkins = new JenkinsRule();
+    private JenkinsRule jenkins;
+
+    @BeforeEach
+    void setUp(JenkinsRule rule) {
+        jenkins = rule;
+    }
 
     @Test
-    public void testDefaults() {
+    void testDefaults() {
         String sourceFolder = "sourceFolder";
         String destinationFolder = "destinationFolder";
         FolderRenameOperation operation = new FolderRenameOperation(sourceFolder, destinationFolder);
@@ -30,7 +36,7 @@ public class FolderRenameOperationTest {
     }
 
     @Test
-    public void testRunFolderRenameOperation() throws Exception {
+    void testRunFolderRenameOperation() throws Exception {
         FreeStyleProject project = jenkins.createFreeStyleProject("folderRenameTest");
 
         FilePath workspace = jenkins.jenkins.getWorkspaceFor(project);
@@ -47,14 +53,14 @@ public class FolderRenameOperationTest {
         FreeStyleBuild build = project.scheduleBuild2(0).get();
         assertEquals(Result.SUCCESS, build.getResult());
 
-        assertFalse("The source folder should have been renamed", sourceFolder.exists());
+        assertFalse(sourceFolder.exists(), "The source folder should have been renamed");
         FilePath renamedFile = new FilePath(destinationFolder, "file.txt");
-        assertTrue("The file should have been moved to the destination folder", renamedFile.exists());
+        assertTrue(renamedFile.exists(), "The file should have been moved to the destination folder");
         assertEquals("Sample content", renamedFile.readToString());
     }
 
     @Test
-    public void testRunFolderRenameOperationWithTokens() throws Exception {
+    void testRunFolderRenameOperationWithTokens() throws Exception {
         EnvironmentVariablesNodeProperty prop = new EnvironmentVariablesNodeProperty();
         EnvVars envVars = prop.getEnvVars();
         envVars.put("SOURCE_FOLDER", "sourceFolder");
@@ -77,9 +83,9 @@ public class FolderRenameOperationTest {
         FreeStyleBuild build = project.scheduleBuild2(0).get();
         assertEquals(Result.SUCCESS, build.getResult());
 
-        assertFalse("The source folder should have been renamed", sourceFolder.exists());
+        assertFalse(sourceFolder.exists(), "The source folder should have been renamed");
         FilePath renamedFile = new FilePath(destinationFolder, "file.txt");
-        assertTrue("The file should have been moved to the destination folder", renamedFile.exists());
+        assertTrue(renamedFile.exists(), "The file should have been moved to the destination folder");
         assertEquals("Sample content", renamedFile.readToString());
     }
 }

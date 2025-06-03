@@ -1,8 +1,6 @@
 package sp.sd.fileoperations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.security.AnyTypePermission;
@@ -16,26 +14,33 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.WithoutJenkins;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-public class FileDeleteOperationTest {
-    @Rule
-    public JenkinsRule jenkins = new JenkinsRule();
+@WithJenkins
+class FileDeleteOperationTest {
 
-    @Test
-    @WithoutJenkins
-    public void testDefaults() {
-        FileDeleteOperation fdo = new FileDeleteOperation("**/*.txt", "**/*.xml");
-        assertEquals("**/*.txt", fdo.getIncludes());
-        assertEquals("**/*.xml", fdo.getExcludes());
-        assertEquals(true, fdo.getUseDefaultExcludes());
+    private JenkinsRule jenkins;
+
+    @BeforeEach
+    void setUp(JenkinsRule rule) {
+        jenkins = rule;
     }
 
     @Test
-    public void testRunFileOperationWithFileOperationBuildStep() throws Exception {
+    @WithoutJenkins
+    void testDefaults() {
+        FileDeleteOperation fdo = new FileDeleteOperation("**/*.txt", "**/*.xml");
+        assertEquals("**/*.txt", fdo.getIncludes());
+        assertEquals("**/*.xml", fdo.getExcludes());
+        assertTrue(fdo.getUseDefaultExcludes());
+    }
+
+    @Test
+    void testRunFileOperationWithFileOperationBuildStep() throws Exception {
         // Given
         FileCreateOperation fco = new FileCreateOperation("NewFileName.txt", "This is File Content");
         FileDeleteOperation fdo = new FileDeleteOperation("**/*.txt", "**/*.xml");
@@ -54,7 +59,7 @@ public class FileDeleteOperationTest {
     }
 
     @Test
-    public void testRunFileOperationWithFileOperationBuildStepWithTokens() throws Exception {
+    void testRunFileOperationWithFileOperationBuildStepWithTokens() throws Exception {
         // Given
         EnvironmentVariablesNodeProperty prop = new EnvironmentVariablesNodeProperty();
         EnvVars envVars = prop.getEnvVars();
@@ -78,7 +83,7 @@ public class FileDeleteOperationTest {
     }
 
     @Test
-    public void testRunFileOperationWithFileOperationBuildStepWithDefaultExcludes() throws Exception {
+    void testRunFileOperationWithFileOperationBuildStepWithDefaultExcludes() throws Exception {
         // Given
         FileCreateOperation fco = new FileCreateOperation(".gitignore", "This is File Content");
         FileDeleteOperation fdo = new FileDeleteOperation(".gitignore", "");
@@ -95,7 +100,7 @@ public class FileDeleteOperationTest {
     }
 
     @Test
-    public void testRunFileOperationWithFileOperationBuildStepWithoutDefaultExcludes() throws Exception {
+    void testRunFileOperationWithFileOperationBuildStepWithoutDefaultExcludes() throws Exception {
         // Given
         FileCreateOperation fco = new FileCreateOperation(".gitignore", "This is File Content");
         FileDeleteOperation fdo = new FileDeleteOperation(".gitignore", "");
@@ -114,7 +119,7 @@ public class FileDeleteOperationTest {
 
     @Test
     @WithoutJenkins
-    public void testSerializeWithXStream() {
+    void testSerializeWithXStream() {
         // Given
         FileDeleteOperation originalObject = new FileDeleteOperation("include", "exclude");
         originalObject.setUseDefaultExcludes(false);
@@ -133,7 +138,7 @@ public class FileDeleteOperationTest {
 
     @Test
     @WithoutJenkins
-    public void testSerializeWithXStreamBackwardsCompatibility() {
+    void testSerializeWithXStreamBackwardsCompatibility() {
         // Given
         String serializedObjectXml = "<FileDeleteOperation><includes>include</includes><excludes>exclude</excludes></FileDeleteOperation>";
 

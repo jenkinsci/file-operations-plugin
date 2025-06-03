@@ -1,35 +1,40 @@
 package sp.sd.fileoperations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.*;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.WithoutJenkins;
 
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-public class FileZipOperationTest {
-    @Rule
-    public JenkinsRule jenkins = new JenkinsRule();
+@WithJenkins
+class FileZipOperationTest {
+
+    private JenkinsRule jenkins;
+
+    @BeforeEach
+    void setUp(JenkinsRule rule) {
+        jenkins = rule;
+    }
 
     @Test
     @WithoutJenkins
-    public void testDefaults() {
+    void testDefaults() {
         FileZipOperation fzo = new FileZipOperation("source", null);
         assertEquals("source", fzo.getFolderPath());
         assertNull(fzo.getOutputFolderPath());
     }
 
     @Test
-    public void testRunFileOperationZipDirectoryToDefaultOutput() throws Exception {
+    void testRunFileOperationZipDirectoryToDefaultOutput() throws Exception {
         FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
         List<FileOperation> fop = new ArrayList<>();
         fop.add(new FileCreateOperation("source-directory/nested-folder1/TestFile1-1", ""));
@@ -49,7 +54,7 @@ public class FileZipOperationTest {
     }
 
     @Test
-    public void testRunFileOperationZipFileToDefaultOutput() throws Exception {
+    void testRunFileOperationZipFileToDefaultOutput() throws Exception {
         FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
         List<FileOperation> fop = new ArrayList<>();
         fop.add(new FileCreateOperation("source-directory/nested-folder1/TestFile1-1", ""));
@@ -65,7 +70,7 @@ public class FileZipOperationTest {
     }
 
     @Test
-    public void testRunFileOperationZipDirectoryToCustomOutput() throws Exception {
+    void testRunFileOperationZipDirectoryToCustomOutput() throws Exception {
         FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
         List<FileOperation> fop = new ArrayList<>();
         fop.add(new FileCreateOperation("source-directory/nested-folder1/TestFile1-1", ""));
@@ -87,7 +92,7 @@ public class FileZipOperationTest {
     }
 
     @Test
-    public void testRunFileOperationZipFileToCustomOutput() throws Exception {
+    void testRunFileOperationZipFileToCustomOutput() throws Exception {
         FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
         List<FileOperation> fop = new ArrayList<>();
         fop.add(new FileCreateOperation("source-directory/nested-folder1/TestFile1-1", ""));

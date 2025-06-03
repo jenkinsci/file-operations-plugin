@@ -1,8 +1,6 @@
 package sp.sd.fileoperations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.jupiter.api.Assertions.*;
 
 import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.security.AnyTypePermission;
@@ -15,26 +13,32 @@ import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.WithoutJenkins;
 
 import java.util.Arrays;
 import java.util.List;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-public class FileTransformOperationTest {
+@WithJenkins
+class FileTransformOperationTest {
 
-    @Rule
-    public JenkinsRule jenkins = new JenkinsRule();
+    private JenkinsRule jenkins;
+
+    @BeforeEach
+    void setUp(JenkinsRule rule) {
+        jenkins = rule;
+    }
 
     @Test
     @WithoutJenkins
-    public void testDefaults() {
+    void testDefaults() {
         FileTransformOperation fto = new FileTransformOperation("NewFileName.config", "**/*.xml");
         assertEquals("NewFileName.config", fto.getIncludes());
         assertEquals("**/*.xml", fto.getExcludes());
-        assertEquals(true, fto.getUseDefaultExcludes());
+        assertTrue(fto.getUseDefaultExcludes());
     }
 
     static final class FileOperationPutEnvironment extends FileOperation {
@@ -49,20 +53,18 @@ public class FileTransformOperationTest {
         }
 
         public boolean runOperation(Run<?, ?> run, FilePath buildWorkspace, Launcher launcher, TaskListener listener) {
-            try {
+            assertDoesNotThrow(() -> {
                 EnvironmentVariablesNodeProperty prop = new EnvironmentVariablesNodeProperty();
                 EnvVars envVars = prop.getEnvVars();
                 envVars.put(key, value);
                 jenkins.jenkins.getGlobalNodeProperties().add(prop);
-            } catch (Exception e) {
-                fail("Unexpected exception during environment put.");
-            }
+            }, "Unexpected exception during environment put.");
             return true;
         }
     }
 
     @Test
-    public void testRunFileOperationWithFileOperationBuildStepWithTokens() throws Exception {
+    void testRunFileOperationWithFileOperationBuildStepWithTokens() throws Exception {
         // Given
         FileCreateOperation fco = new FileCreateOperation("TestFile.txt", "$Content");
         FileOperationPutEnvironment fpo = new FileOperationPutEnvironment(jenkins, "Content", "ReplacementContent");
@@ -80,7 +82,7 @@ public class FileTransformOperationTest {
     }
 
     @Test
-    public void testRunFileOperationWithFileOperationBuildStepWithDefaultExcludes() throws Exception {
+    void testRunFileOperationWithFileOperationBuildStepWithDefaultExcludes() throws Exception {
         // Given
         FileCreateOperation fco = new FileCreateOperation(".gitignore", "$Content");
         FileOperationPutEnvironment fpo = new FileOperationPutEnvironment(jenkins, "Content", "ReplacementContent");
@@ -99,7 +101,7 @@ public class FileTransformOperationTest {
     }
 
     @Test
-    public void testRunFileOperationWithFileOperationBuildStepWithoutDefaultExcludes() throws Exception {
+    void testRunFileOperationWithFileOperationBuildStepWithoutDefaultExcludes() throws Exception {
         // Given
         FileCreateOperation fco = new FileCreateOperation(".gitignore", "$Content");
         FileOperationPutEnvironment fpo = new FileOperationPutEnvironment(jenkins, "Content", "ReplacementContent");
@@ -119,7 +121,7 @@ public class FileTransformOperationTest {
 
     @Test
     @WithoutJenkins
-    public void testSerializeWithXStream() {
+    void testSerializeWithXStream() {
         // Given
         FileTransformOperation originalObject = new FileTransformOperation("include", "exclude");
         originalObject.setUseDefaultExcludes(false);
@@ -138,7 +140,7 @@ public class FileTransformOperationTest {
 
     @Test
     @WithoutJenkins
-    public void testSerializeWithXStreamBackwardsCompatibility() {
+    void testSerializeWithXStreamBackwardsCompatibility() {
         // Given
         String serializedObjectXml = "<FileTransformOperation><includes>include</includes><excludes>exclude</excludes></FileTransformOperation>";
 

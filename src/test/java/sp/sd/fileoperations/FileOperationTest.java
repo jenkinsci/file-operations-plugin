@@ -1,9 +1,9 @@
 package sp.sd.fileoperations;
 
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import org.junit.Test;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.WithoutJenkins;
 
 import hudson.FilePath;
@@ -11,11 +11,11 @@ import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 
-public class FileOperationTest {
+class FileOperationTest {
 
     @Test
     @WithoutJenkins
-    public void testAbstractFileOperation() {
+    void testAbstractFileOperation() {
         // Create a concrete implementation of the abstract class for testing
         FileOperation operation = new FileOperation() {
             @Override

@@ -6,22 +6,28 @@ import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import java.util.List;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
-public class FolderDeleteOperationTest {
+@WithJenkins
+class FolderDeleteOperationTest {
 
-    @Rule
-    public JenkinsRule jenkins = new JenkinsRule();
+    private JenkinsRule jenkins;
+
+    @BeforeEach
+    void setUp(JenkinsRule rule) {
+        jenkins = rule;
+    }
 
     @Test
-    public void testDefaults() {
+    void testDefaults() {
         String folderPath = "folderToDelete";
         FolderDeleteOperation operation = new FolderDeleteOperation(folderPath);
 
@@ -29,7 +35,7 @@ public class FolderDeleteOperationTest {
     }
 
     @Test
-    public void testRunFolderDeleteOperation() throws Exception {
+    void testRunFolderDeleteOperation() throws Exception {
         FreeStyleProject project = jenkins.createFreeStyleProject("folderDeleteTest");
 
         FilePath workspace = jenkins.jenkins.getWorkspaceFor(project);
@@ -45,11 +51,11 @@ public class FolderDeleteOperationTest {
         FreeStyleBuild build = project.scheduleBuild2(0).get();
         assertEquals(Result.SUCCESS, build.getResult());
 
-        assertFalse("The folder should have been deleted", folderToDelete.exists());
+        assertFalse(folderToDelete.exists(), "The folder should have been deleted");
     }
 
     @Test
-    public void testRunFolderDeleteOperationWithTokens() throws Exception {
+    void testRunFolderDeleteOperationWithTokens() throws Exception {
         EnvironmentVariablesNodeProperty prop = new EnvironmentVariablesNodeProperty();
         EnvVars envVars = prop.getEnvVars();
         envVars.put("FOLDER_TO_DELETE", "folderToDelete");
@@ -70,6 +76,6 @@ public class FolderDeleteOperationTest {
         FreeStyleBuild build = project.scheduleBuild2(0).get();
         assertEquals(Result.SUCCESS, build.getResult());
 
-        assertFalse("The folder should have been deleted", folderToDelete.exists());
+        assertFalse(folderToDelete.exists(), "The folder should have been deleted");
     }
 }

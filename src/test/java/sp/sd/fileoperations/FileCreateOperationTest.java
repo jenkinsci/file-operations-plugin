@@ -1,7 +1,7 @@
 package sp.sd.fileoperations;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import hudson.EnvVars;
 import hudson.model.FreeStyleBuild;
@@ -12,25 +12,32 @@ import hudson.slaves.EnvironmentVariablesNodeProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.WithoutJenkins;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-public class FileCreateOperationTest {
-    @Rule
-    public JenkinsRule jenkins = new JenkinsRule();
+@WithJenkins
+class FileCreateOperationTest {
+
+    private JenkinsRule jenkins;
+
+    @BeforeEach
+    void setUp(JenkinsRule rule) {
+        jenkins = rule;
+    }
 
     @Test
     @WithoutJenkins
-    public void testDefaults() {
+    void testDefaults() {
         FileCreateOperation fco = new FileCreateOperation("NewFileName.txt", "This is File Content");
         assertEquals("NewFileName.txt", fco.getFileName());
         assertEquals("This is File Content", fco.getFileContent());
     }
 
     @Test
-    public void testRunFileOperationWithFileOperationBuildStep() throws Exception {
+    void testRunFileOperationWithFileOperationBuildStep() throws Exception {
         FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
         FileCreateOperation fco = new FileCreateOperation("NewFileName.txt", "This is File Content");
         List<FileOperation> fop = new ArrayList<>();
@@ -42,8 +49,7 @@ public class FileCreateOperationTest {
     }
 
     @Test
-    public void testRunFileOperationWithFileOperationBuildStepWithTokens() throws Exception {
-
+    void testRunFileOperationWithFileOperationBuildStepWithTokens() throws Exception {
         EnvironmentVariablesNodeProperty prop = new EnvironmentVariablesNodeProperty();
         EnvVars envVars = prop.getEnvVars();
         envVars.put("TextFileName", "NewFileName.txt");

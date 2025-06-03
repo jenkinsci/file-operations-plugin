@@ -7,6 +7,7 @@ import hudson.model.Run;
 import hudson.model.TaskListener;
 import org.apache.hc.core5.http.HttpHeaders;
 import org.apache.hc.core5.http.HttpStatus;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.RegisterExtension;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -28,108 +29,114 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @WithJenkins
 class FileDownloadOperationTest {
 
-	// matches the file in __files
-	private static final String DUMMY_ZIP = "dummy.zip";
-	private static final String TEST_PATH = "/test/" + DUMMY_ZIP;
+    // matches the file in __files
+    private static final String DUMMY_ZIP = "dummy.zip";
+    private static final String TEST_PATH = "/test/" + DUMMY_ZIP;
 
-	@RegisterExtension
-	static WireMockExtension wireMock = WireMockExtension.newInstance()
-			.options(options().dynamicPort())
-			.build();
+    @RegisterExtension
+    static WireMockExtension wireMock = WireMockExtension.newInstance()
+        .options(options().dynamicPort())
+        .build();
 
-	@Test
-	void shouldDownload(JenkinsRule r) throws Exception {
+    private JenkinsRule jenkins;
 
-		// endpoint without authentication
-		wireMock.stubFor(get(urlEqualTo(TEST_PATH))
-				.willReturn(aResponse()
-						.withStatus(HttpStatus.SC_OK)
-						.withBodyFile(DUMMY_ZIP) // matches the file in __files
-						.withHeader(HttpHeaders.CONTENT_TYPE, "application/zip")));
+    @BeforeEach
+    void setUp(JenkinsRule rule) {
+        jenkins = rule;
+    }
 
-		// define operation & run
-		FreeStyleProject project = r.createFreeStyleProject();
-		Run run = project.scheduleBuild2(0).get();
-		FileDownloadOperation operation = new FileDownloadOperation(
-				wireMock.baseUrl() + TEST_PATH,
-				"",
-				"",
-				run.getRootDir().getAbsolutePath(),
-				DUMMY_ZIP,
-				null,
-				null);
-		boolean result = operation.runOperation(run, r.jenkins.getWorkspaceFor(project), null, TaskListener.NULL);
-		File download = new File(operation.getTargetLocation(), operation.getTargetFileName());
+    @Test
+    void shouldDownload() throws Exception {
+        // endpoint without authentication
+        wireMock.stubFor(get(urlEqualTo(TEST_PATH))
+            .willReturn(aResponse()
+                .withStatus(HttpStatus.SC_OK)
+                .withBodyFile(DUMMY_ZIP) // matches the file in __files
+                .withHeader(HttpHeaders.CONTENT_TYPE, "application/zip")));
 
-		// validate
-		assertTrue(result);
-		assertTrue(download.exists());
-		assertTrue(download.length() > 0);
-	}
+        // define operation & run
+        FreeStyleProject project = jenkins.createFreeStyleProject();
+        Run run = project.scheduleBuild2(0).get();
+        FileDownloadOperation operation = new FileDownloadOperation(
+            wireMock.baseUrl() + TEST_PATH,
+            "",
+            "",
+            run.getRootDir().getAbsolutePath(),
+            DUMMY_ZIP,
+            null,
+            null);
+        boolean result = operation.runOperation(run, jenkins.jenkins.getWorkspaceFor(project), null, TaskListener.NULL);
+        File download = new File(operation.getTargetLocation(), operation.getTargetFileName());
 
-	@Test
-	void shouldDownloadWithBasicAuth(JenkinsRule r) throws Exception {
-		String username = RandomStringUtils.secure().nextAlphabetic(10);
-		String password = RandomStringUtils.secure().nextAlphabetic(10);
+        // validate
+        assertTrue(result);
+        assertTrue(download.exists());
+        assertTrue(download.length() > 0);
+    }
 
-		// endpoint with authentication
-		wireMock.stubFor(get(urlEqualTo(TEST_PATH))
-				.withBasicAuth(username, password)
-				.willReturn(aResponse()
-						.withStatus(HttpStatus.SC_OK)
-						.withBodyFile(DUMMY_ZIP) // matches the file in __files
-						.withHeader(HttpHeaders.CONTENT_TYPE, "application/zip")));
+    @Test
+    void shouldDownloadWithBasicAuth() throws Exception {
+        String username = RandomStringUtils.secure().nextAlphabetic(10);
+        String password = RandomStringUtils.secure().nextAlphabetic(10);
 
-		// define operation & run
-		FreeStyleProject project = r.createFreeStyleProject();
-		Run run = project.scheduleBuild2(0).get();
-		FileDownloadOperation operation = new FileDownloadOperation(
-				wireMock.baseUrl() + TEST_PATH,
-				username,
-				password,
-				run.getRootDir().getAbsolutePath(),
-				DUMMY_ZIP,
-				null,
-				null);
-		boolean result = operation.runOperation(run, r.jenkins.getWorkspaceFor(project), null, TaskListener.NULL);
-		File download = new File(operation.getTargetLocation(), operation.getTargetFileName());
+        // endpoint with authentication
+        wireMock.stubFor(get(urlEqualTo(TEST_PATH))
+            .withBasicAuth(username, password)
+            .willReturn(aResponse()
+                .withStatus(HttpStatus.SC_OK)
+                .withBodyFile(DUMMY_ZIP) // matches the file in __files
+                .withHeader(HttpHeaders.CONTENT_TYPE, "application/zip")));
 
-		// validate
-		assertTrue(result);
-		assertTrue(download.exists());
-		assertTrue(download.length() > 0);
-	}
+        // define operation & run
+        FreeStyleProject project = jenkins.createFreeStyleProject();
+        Run run = project.scheduleBuild2(0).get();
+        FileDownloadOperation operation = new FileDownloadOperation(
+            wireMock.baseUrl() + TEST_PATH,
+            username,
+            password,
+            run.getRootDir().getAbsolutePath(),
+            DUMMY_ZIP,
+            null,
+            null);
+        boolean result = operation.runOperation(run, jenkins.jenkins.getWorkspaceFor(project), null, TaskListener.NULL);
+        File download = new File(operation.getTargetLocation(), operation.getTargetFileName());
 
-	@Test
-	void shouldFailWithBadCredentials(JenkinsRule r) throws Exception {
-		String username = RandomStringUtils.secure().nextAlphabetic(10);
-		String password = RandomStringUtils.secure().nextAlphabetic(10);
+        // validate
+        assertTrue(result);
+        assertTrue(download.exists());
+        assertTrue(download.length() > 0);
+    }
 
-		// endpoint with authentication
-		wireMock.stubFor(get(urlEqualTo(TEST_PATH))
-				.withBasicAuth(username, password)
-				.willReturn(aResponse()
-						.withStatus(HttpStatus.SC_OK)
-						.withBodyFile(DUMMY_ZIP) // matches the file in __files
-						.withHeader(HttpHeaders.CONTENT_TYPE, "application/zip")));
+    @Test
+    void shouldFailWithBadCredentials() throws Exception {
+        String username = RandomStringUtils.secure().nextAlphabetic(10);
+        String password = RandomStringUtils.secure().nextAlphabetic(10);
 
-		// define operation & run
-		FreeStyleProject project = r.createFreeStyleProject();
-		Run run = project.scheduleBuild2(0).get();
-		FileDownloadOperation operation = new FileDownloadOperation(
-				wireMock.baseUrl() + TEST_PATH,
-				RandomStringUtils.secure().nextAlphabetic(10),
-				RandomStringUtils.secure().nextAlphabetic(10),
-				run.getRootDir().getAbsolutePath(),
-				DUMMY_ZIP,
-				null,
-				null);
-		boolean result = operation.runOperation(run, r.jenkins.getWorkspaceFor(project), null, TaskListener.NULL);
-		File download = new File(operation.getTargetLocation(), operation.getTargetFileName());
+        // endpoint with authentication
+        wireMock.stubFor(get(urlEqualTo(TEST_PATH))
+            .withBasicAuth(username, password)
+            .willReturn(aResponse()
+                .withStatus(HttpStatus.SC_OK)
+                .withBodyFile(DUMMY_ZIP) // matches the file in __files
+                .withHeader(HttpHeaders.CONTENT_TYPE, "application/zip")));
 
-		// validate
-		assertFalse(result);
-		assertTrue(download.exists()); // empty file created
-		assertEquals(0, download.length()); // empty file created
-	}
+        // define operation & run
+        FreeStyleProject project = jenkins.createFreeStyleProject();
+        Run run = project.scheduleBuild2(0).get();
+        FileDownloadOperation operation = new FileDownloadOperation(
+            wireMock.baseUrl() + TEST_PATH,
+            RandomStringUtils.secure().nextAlphabetic(10),
+            RandomStringUtils.secure().nextAlphabetic(10),
+            run.getRootDir().getAbsolutePath(),
+            DUMMY_ZIP,
+            null,
+            null);
+        boolean result = operation.runOperation(run, jenkins.jenkins.getWorkspaceFor(project), null, TaskListener.NULL);
+        File download = new File(operation.getTargetLocation(), operation.getTargetFileName());
+
+        // validate
+        assertFalse(result);
+        assertTrue(download.exists()); // empty file created
+        assertEquals(0, download.length()); // empty file created
+    }
 }

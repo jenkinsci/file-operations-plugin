@@ -6,22 +6,28 @@ import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
-import org.junit.Rule;
-import org.junit.Test;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 
 import java.util.List;
+import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 
-public class FolderCopyOperationTest {
+@WithJenkins
+class FolderCopyOperationTest {
 
-    @Rule
-    public JenkinsRule jenkins = new JenkinsRule();
+    private JenkinsRule jenkins;
+
+    @BeforeEach
+    void setUp(JenkinsRule rule) {
+        jenkins = rule;
+    }
 
     @Test
-    public void testDefaults() {
+    void testDefaults() {
         String sourceFolderPath = "sourceFolder";
         String destinationFolderPath = "destinationFolder";
         FolderCopyOperation operation = new FolderCopyOperation(sourceFolderPath, destinationFolderPath);
@@ -31,7 +37,7 @@ public class FolderCopyOperationTest {
     }
 
     @Test
-    public void testRunFolderCopyOperation() throws Exception {
+    void testRunFolderCopyOperation() throws Exception {
         FreeStyleProject project = jenkins.createFreeStyleProject("folderCopyTest");
 
         FilePath workspace = jenkins.jenkins.getWorkspaceFor(project);
@@ -49,13 +55,13 @@ public class FolderCopyOperationTest {
         assertEquals(Result.SUCCESS, build.getResult());
 
         FilePath copiedFile = new FilePath(destinationFolder, "file.txt");
-        assertTrue("The destination folder should have been created", destinationFolder.exists());
-        assertTrue("The file should have been copied to the destination folder", copiedFile.exists());
+        assertTrue(destinationFolder.exists(), "The destination folder should have been created");
+        assertTrue(copiedFile.exists(), "The file should have been copied to the destination folder");
         assertEquals("Sample content", copiedFile.readToString());
     }
 
     @Test
-    public void testRunFolderCopyOperationWithTokens() throws Exception {
+    void testRunFolderCopyOperationWithTokens() throws Exception {
         EnvironmentVariablesNodeProperty prop = new EnvironmentVariablesNodeProperty();
         EnvVars envVars = prop.getEnvVars();
         envVars.put("SOURCE_FOLDER", "sourceFolder");
@@ -79,8 +85,8 @@ public class FolderCopyOperationTest {
         assertEquals(Result.SUCCESS, build.getResult());
 
         FilePath copiedFile = new FilePath(destinationFolder, "file.txt");
-        assertTrue("The destination folder should have been created", destinationFolder.exists());
-        assertTrue("The file should have been copied to the destination folder", copiedFile.exists());
+        assertTrue(destinationFolder.exists(), "The destination folder should have been created");
+        assertTrue(copiedFile.exists(), "The file should have been copied to the destination folder");
         assertEquals("Sample content", copiedFile.readToString());
     }
 }
