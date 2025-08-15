@@ -13,6 +13,7 @@ import org.kohsuke.stapler.DataBoundConstructor;
 
 import java.io.File;
 import java.io.Serializable;
+import java.util.List;
 
 public class FileZipOperation extends FileOperation implements Serializable {
 
@@ -75,7 +76,10 @@ public class FileZipOperation extends FileOperation implements Serializable {
                 FilePath fpTL = new FilePath(fpWS, resolvedFolderPath);
                 listener.getLogger().println(
                     "Creating Zip file of " + fpTL.getRemote() + " in " + fpWSOutput);
-                fpTL.zip(new FilePath(fpWSOutput, fpTL.getName() + ".zip"));
+                List<FilePath> files = fpTL.list();
+                for (FilePath file : files) {
+                    file.zip(new FilePath(fpWSOutput, file.getName() + ".zip"));
+                }
                 result = true;
             } catch (RuntimeException e) {
                 listener.fatalError(e.getMessage());
