@@ -41,7 +41,9 @@ class FileZipOperationTest {
         fop.add(new FileCreateOperation("source-directory/nested-folder2/TestFile2-1", ""));
         fop.add(new FileCreateOperation("source-directory/nested-folder2/TestFile2-2", ""));
         fop.add(new FileZipOperation("source-directory", null));
-        fop.add(new FileUnZipOperation("source-directory.zip", "unzipped-directory"));
+        fop.add(new FileUnZipOperation("source-directory/nested-folder1/TestFile1-1.zip", "unzipped-directory"));
+        fop.add(new FileUnZipOperation("source-directory/nested-folder2/TestFile2-1.zip", "unzipped-directory"));
+        fop.add(new FileUnZipOperation("source-directory/nested-folder2/TestFile2-2.zip", "unzipped-directory"));
         p1.getBuildersList().add(new FileOperationsBuilder(fop));
 
         FreeStyleBuild build = p1.scheduleBuild2(0).get();
@@ -59,7 +61,7 @@ class FileZipOperationTest {
         List<FileOperation> fop = new ArrayList<>();
         fop.add(new FileCreateOperation("source-directory/nested-folder1/TestFile1-1", ""));
         fop.add(new FileZipOperation("source-directory/nested-folder1/TestFile1-1", null));
-        fop.add(new FileUnZipOperation("TestFile1-1.zip", "unzipped-directory"));
+        fop.add(new FileUnZipOperation("nested-folder1/TestFile1-1.zip", "unzipped-directory"));
         p1.getBuildersList().add(new FileOperationsBuilder(fop));
 
         FreeStyleBuild build = p1.scheduleBuild2(0).get();
@@ -77,9 +79,9 @@ class FileZipOperationTest {
         fop.add(new FileCreateOperation("source-directory/nested-folder2/TestFile2-1", ""));
         fop.add(new FileCreateOperation("source-directory/nested-folder2/TestFile2-2", ""));
         fop.add(new FileZipOperation("source-directory", "output-directory/nested-output-folder1"));
-        fop.add(new FileUnZipOperation(
-            "output-directory/nested-output-folder1/source-directory.zip",
-            "unzipped-directory"));
+        fop.add(new FileUnZipOperation("output-directory/nested-output-folder1/source-directory/nested-folder1/TestFile1-1.zip", "unzipped-directory"));
+        fop.add(new FileUnZipOperation("output-directory/nested-output-folder1/source-directory/nested-folder2/TestFile2-1.zip", "unzipped-directory"));
+        fop.add(new FileUnZipOperation("output-directory/nested-output-folder1/source-directory/nested-folder2/TestFile2-2.zip", "unzipped-directory"));
         p1.getBuildersList().add(new FileOperationsBuilder(fop));
 
         FreeStyleBuild build = p1.scheduleBuild2(0).get();
@@ -100,8 +102,8 @@ class FileZipOperationTest {
             "source-directory/nested-folder1/TestFile1-1",
             "output-directory/nested-output-folder1"));
         fop.add(new FileUnZipOperation(
-            "output-directory/nested-output-folder1/TestFile1-1.zip",
-            "unzipped-directory"));
+                "output-directory/nested-output-folder1/nested-folder1/TestFile1-1.zip",
+                "unzipped-directory"));
         p1.getBuildersList().add(new FileOperationsBuilder(fop));
 
         FreeStyleBuild build = p1.scheduleBuild2(0).get();
