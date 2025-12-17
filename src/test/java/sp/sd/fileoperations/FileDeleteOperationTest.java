@@ -6,14 +6,12 @@ import com.thoughtworks.xstream.XStream;
 import com.thoughtworks.xstream.security.AnyTypePermission;
 import hudson.EnvVars;
 import hudson.model.FreeStyleBuild;
-import hudson.model.Result;
 import hudson.model.FreeStyleProject;
+import hudson.model.Result;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
@@ -128,7 +126,7 @@ class FileDeleteOperationTest {
         XStream xstream = new XStream();
         xstream.addPermission(AnyTypePermission.ANY);
         String serializedObjectXml = xstream.toXML(originalObject);
-        FileDeleteOperation deserializedObject = (FileDeleteOperation)xstream.fromXML(serializedObjectXml);
+        FileDeleteOperation deserializedObject = (FileDeleteOperation) xstream.fromXML(serializedObjectXml);
 
         // Then
         assertEquals(originalObject.getIncludes(), deserializedObject.getIncludes());
@@ -140,13 +138,14 @@ class FileDeleteOperationTest {
     @WithoutJenkins
     void testSerializeWithXStreamBackwardsCompatibility() {
         // Given
-        String serializedObjectXml = "<FileDeleteOperation><includes>include</includes><excludes>exclude</excludes></FileDeleteOperation>";
+        String serializedObjectXml =
+                "<FileDeleteOperation><includes>include</includes><excludes>exclude</excludes></FileDeleteOperation>";
 
         // When
         XStream xstream = new XStream();
         xstream.alias("FileDeleteOperation", FileDeleteOperation.class);
         xstream.addPermission(AnyTypePermission.ANY);
-        FileDeleteOperation deserializedObject = (FileDeleteOperation)xstream.fromXML(serializedObjectXml);
+        FileDeleteOperation deserializedObject = (FileDeleteOperation) xstream.fromXML(serializedObjectXml);
 
         // Then
         assertTrue(deserializedObject.getUseDefaultExcludes());

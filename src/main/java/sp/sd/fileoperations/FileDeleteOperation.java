@@ -1,23 +1,19 @@
 package sp.sd.fileoperations;
 
 import hudson.EnvVars;
-import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.FilePath.FileCallable;
+import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-
+import hudson.remoting.VirtualChannel;
+import java.io.File;
+import java.io.Serializable;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
-
-import java.io.File;
-
-import hudson.FilePath.FileCallable;
-import hudson.remoting.VirtualChannel;
-import org.jenkinsci.remoting.RoleChecker;
-
-import java.io.Serializable;
 
 public class FileDeleteOperation extends FileOperation implements Serializable {
     private final String includes;
@@ -50,7 +46,8 @@ public class FileDeleteOperation extends FileOperation implements Serializable {
             EnvVars envVars = run.getEnvironment(listener);
             try {
                 FilePath ws = new FilePath(buildWorkspace, ".");
-                result = ws.act(new TargetFileCallable(listener, envVars.expand(includes), envVars.expand(excludes), useDefaultExcludes));
+                result = ws.act(new TargetFileCallable(
+                        listener, envVars.expand(includes), envVars.expand(excludes), useDefaultExcludes));
             } catch (Exception e) {
                 listener.fatalError(e.getMessage());
                 return false;
@@ -69,7 +66,8 @@ public class FileDeleteOperation extends FileOperation implements Serializable {
         private final String resolvedExcludes;
         private final boolean useDefaultExcludes;
 
-        public TargetFileCallable(TaskListener Listener, String ResolvedIncludes, String ResolvedExcludes, boolean UseDefaultExcludes) {
+        public TargetFileCallable(
+                TaskListener Listener, String ResolvedIncludes, String ResolvedExcludes, boolean UseDefaultExcludes) {
             this.listener = Listener;
             this.resolvedIncludes = ResolvedIncludes;
             this.resolvedExcludes = ResolvedExcludes;
@@ -83,7 +81,9 @@ public class FileDeleteOperation extends FileOperation implements Serializable {
                 FilePath fpWS = new FilePath(ws);
                 FilePath[] resolvedFiles = fpWS.list(resolvedIncludes, resolvedExcludes, useDefaultExcludes);
                 if (resolvedFiles.length == 0) {
-                    listener.getLogger().println("0 files found for include pattern '" + resolvedIncludes + "' and exclude pattern '" + resolvedExcludes + "'");
+                    listener.getLogger()
+                            .println("0 files found for include pattern '" + resolvedIncludes
+                                    + "' and exclude pattern '" + resolvedExcludes + "'");
                     result = true;
                 }
                 for (FilePath fp : resolvedFiles) {
@@ -112,7 +112,6 @@ public class FileDeleteOperation extends FileOperation implements Serializable {
                             result = false;
                         }
                     }
-
                 }
             } catch (RuntimeException e) {
                 listener.fatalError(e.getMessage());
@@ -125,9 +124,7 @@ public class FileDeleteOperation extends FileOperation implements Serializable {
         }
 
         @Override
-        public void checkRoles(RoleChecker checker) throws SecurityException {
-
-        }
+        public void checkRoles(RoleChecker checker) throws SecurityException {}
     }
 
     @Extension

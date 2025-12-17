@@ -4,24 +4,20 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import hudson.EnvVars;
-import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.FilePath.FileCallable;
+import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-
-import org.jenkinsci.Symbol;
-import org.kohsuke.stapler.DataBoundConstructor;
-
-import java.io.File;
-
-import hudson.FilePath.FileCallable;
 import hudson.remoting.VirtualChannel;
-import org.jenkinsci.remoting.RoleChecker;
-
+import java.io.File;
 import java.io.Serializable;
 import java.util.Properties;
 import java.util.regex.Pattern;
+import org.jenkinsci.Symbol;
+import org.jenkinsci.remoting.RoleChecker;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 public class FilePropertiesToJsonOperation extends FileOperation implements Serializable {
     private final String sourceFile;
@@ -48,7 +44,8 @@ public class FilePropertiesToJsonOperation extends FileOperation implements Seri
             EnvVars envVars = run.getEnvironment(listener);
             try {
                 FilePath ws = new FilePath(buildWorkspace, ".");
-                result = ws.act(new TargetFileCallable(listener, envVars.expand(sourceFile), envVars.expand(targetFile), envVars));
+                result = ws.act(new TargetFileCallable(
+                        listener, envVars.expand(sourceFile), envVars.expand(targetFile), envVars));
             } catch (Exception e) {
                 listener.fatalError(e.getMessage());
                 return false;
@@ -66,7 +63,8 @@ public class FilePropertiesToJsonOperation extends FileOperation implements Seri
         private final String resolvedSourceFile;
         private final String resolvedTargetFile;
 
-        public TargetFileCallable(TaskListener Listener, String ResolvedSourceFile, String ResolvedTargetFile, EnvVars environment) {
+        public TargetFileCallable(
+                TaskListener Listener, String ResolvedSourceFile, String ResolvedTargetFile, EnvVars environment) {
             this.listener = Listener;
             this.resolvedSourceFile = ResolvedSourceFile;
             this.resolvedTargetFile = ResolvedTargetFile;
@@ -81,14 +79,17 @@ public class FilePropertiesToJsonOperation extends FileOperation implements Seri
                 FilePath fpSL = new FilePath(fpWS, resolvedSourceFile);
                 FilePath fpTL = new FilePath(fpWS, resolvedTargetFile);
                 if (!fpTL.exists()) {
-                    listener.getLogger().println(resolvedSourceFile + " file doesn't exists, the target file remains as is.");
+                    listener.getLogger()
+                            .println(resolvedSourceFile + " file doesn't exists, the target file remains as is.");
                 } else {
                     String fileContent = "";
                     Properties sourceProperties = new Properties();
                     sourceProperties.load(fpSL.read());
                     fpTL.write(convertToJson(sourceProperties), "UTF-8");
                     result = true;
-                    listener.getLogger().println("Creating Json: from source " + fpSL.getRemote() + " to target " + fpTL.getRemote());
+                    listener.getLogger()
+                            .println("Creating Json: from source " + fpSL.getRemote() + " to target "
+                                    + fpTL.getRemote());
                 }
             } catch (RuntimeException e) {
                 listener.fatalError(e.getMessage());
@@ -123,9 +124,7 @@ public class FilePropertiesToJsonOperation extends FileOperation implements Seri
         }
 
         @Override
-        public void checkRoles(RoleChecker checker) throws SecurityException {
-
-        }
+        public void checkRoles(RoleChecker checker) throws SecurityException {}
     }
 
     @Extension
@@ -134,6 +133,5 @@ public class FilePropertiesToJsonOperation extends FileOperation implements Seri
         public String getDisplayName() {
             return "File Properties to Json";
         }
-
     }
 }

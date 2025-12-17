@@ -5,13 +5,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import hudson.EnvVars;
 import hudson.model.FreeStyleBuild;
-import hudson.model.Result;
 import hudson.model.FreeStyleProject;
+import hudson.model.Result;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
-
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;

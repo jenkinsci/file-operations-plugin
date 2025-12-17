@@ -13,13 +13,12 @@ import hudson.model.Result;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
+import java.util.Arrays;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.WithoutJenkins;
-
-import java.util.Arrays;
-import java.util.List;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 @WithJenkins
@@ -53,12 +52,14 @@ class FileTransformOperationTest {
         }
 
         public boolean runOperation(Run<?, ?> run, FilePath buildWorkspace, Launcher launcher, TaskListener listener) {
-            assertDoesNotThrow(() -> {
-                EnvironmentVariablesNodeProperty prop = new EnvironmentVariablesNodeProperty();
-                EnvVars envVars = prop.getEnvVars();
-                envVars.put(key, value);
-                jenkins.jenkins.getGlobalNodeProperties().add(prop);
-            }, "Unexpected exception during environment put.");
+            assertDoesNotThrow(
+                    () -> {
+                        EnvironmentVariablesNodeProperty prop = new EnvironmentVariablesNodeProperty();
+                        EnvVars envVars = prop.getEnvVars();
+                        envVars.put(key, value);
+                        jenkins.jenkins.getGlobalNodeProperties().add(prop);
+                    },
+                    "Unexpected exception during environment put.");
             return true;
         }
     }
@@ -78,7 +79,8 @@ class FileTransformOperationTest {
 
         // Then
         assertEquals(Result.SUCCESS, build.getResult());
-        assertEquals("ReplacementContent", build.getWorkspace().child("TestFile.txt").readToString());
+        assertEquals(
+                "ReplacementContent", build.getWorkspace().child("TestFile.txt").readToString());
     }
 
     @Test
@@ -116,7 +118,8 @@ class FileTransformOperationTest {
 
         // Then
         assertEquals(Result.SUCCESS, build.getResult());
-        assertEquals("ReplacementContent", build.getWorkspace().child(".gitignore").readToString());
+        assertEquals(
+                "ReplacementContent", build.getWorkspace().child(".gitignore").readToString());
     }
 
     @Test
@@ -130,7 +133,7 @@ class FileTransformOperationTest {
         XStream xstream = new XStream();
         xstream.addPermission(AnyTypePermission.ANY);
         String serializedObjectXml = xstream.toXML(originalObject);
-        FileTransformOperation deserializedObject = (FileTransformOperation)xstream.fromXML(serializedObjectXml);
+        FileTransformOperation deserializedObject = (FileTransformOperation) xstream.fromXML(serializedObjectXml);
 
         // Then
         assertEquals(originalObject.getIncludes(), deserializedObject.getIncludes());
@@ -142,13 +145,14 @@ class FileTransformOperationTest {
     @WithoutJenkins
     void testSerializeWithXStreamBackwardsCompatibility() {
         // Given
-        String serializedObjectXml = "<FileTransformOperation><includes>include</includes><excludes>exclude</excludes></FileTransformOperation>";
+        String serializedObjectXml =
+                "<FileTransformOperation><includes>include</includes><excludes>exclude</excludes></FileTransformOperation>";
 
         // When
         XStream xstream = new XStream();
         xstream.alias("FileTransformOperation", FileTransformOperation.class);
         xstream.addPermission(AnyTypePermission.ANY);
-        FileTransformOperation deserializedObject = (FileTransformOperation)xstream.fromXML(serializedObjectXml);
+        FileTransformOperation deserializedObject = (FileTransformOperation) xstream.fromXML(serializedObjectXml);
 
         // Then
         assertTrue(deserializedObject.getUseDefaultExcludes());

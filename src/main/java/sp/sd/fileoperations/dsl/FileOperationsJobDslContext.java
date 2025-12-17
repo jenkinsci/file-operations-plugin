@@ -1,5 +1,7 @@
 package sp.sd.fileoperations.dsl;
 
+import java.util.ArrayList;
+import java.util.List;
 import javaposse.jobdsl.dsl.Context;
 import sp.sd.fileoperations.FileCopyOperation;
 import sp.sd.fileoperations.FileCreateOperation;
@@ -18,9 +20,6 @@ import sp.sd.fileoperations.FolderCreateOperation;
 import sp.sd.fileoperations.FolderDeleteOperation;
 import sp.sd.fileoperations.FolderRenameOperation;
 
-import java.util.ArrayList;
-import java.util.List;
-
 public class FileOperationsJobDslContext implements Context {
     final List<FileOperation> fileOperations = new ArrayList<>();
 
@@ -29,15 +28,17 @@ public class FileOperationsJobDslContext implements Context {
         fileOperations.add(fileCreateOperation);
     }
 
-    public void fileCopyOperation(String includes,
-                                  String excludes,
-                                  String targetLocation,
-                                  boolean flattenFiles,
-                                  boolean renameFiles,
-                                  String sourceCaptureExpression,
-                                  String targetNameExpression,
-                                  boolean useDefaultExcludes) {
-        FileCopyOperation fileCopyOperation = new FileCopyOperation(includes,
+    public void fileCopyOperation(
+            String includes,
+            String excludes,
+            String targetLocation,
+            boolean flattenFiles,
+            boolean renameFiles,
+            String sourceCaptureExpression,
+            String targetNameExpression,
+            boolean useDefaultExcludes) {
+        FileCopyOperation fileCopyOperation = new FileCopyOperation(
+                includes,
                 excludes,
                 targetLocation,
                 flattenFiles,
@@ -48,21 +49,23 @@ public class FileOperationsJobDslContext implements Context {
         fileOperations.add(fileCopyOperation);
     }
 
-    public void fileCopyOperation(String includes,
-                                  String excludes,
-                                  String targetLocation,
-                                  boolean flattenFiles,
-                                  boolean renameFiles,
-                                  String sourceCaptureExpression,
-                                  String targetNameExpression) {
-        fileCopyOperation(includes,
-                          excludes,
-                          targetLocation,
-                          flattenFiles,
-                          renameFiles,
-                          sourceCaptureExpression,
-                          targetNameExpression,
-                          true);
+    public void fileCopyOperation(
+            String includes,
+            String excludes,
+            String targetLocation,
+            boolean flattenFiles,
+            boolean renameFiles,
+            String sourceCaptureExpression,
+            String targetNameExpression) {
+        fileCopyOperation(
+                includes,
+                excludes,
+                targetLocation,
+                flattenFiles,
+                renameFiles,
+                sourceCaptureExpression,
+                targetNameExpression,
+                true);
     }
 
     public void fileDeleteOperation(String includes, String excludes, boolean useDefaultExcludes) {
@@ -75,8 +78,16 @@ public class FileOperationsJobDslContext implements Context {
         fileDeleteOperation(includes, excludes, true);
     }
 
-    public void fileDownloadOperation(String url, String userName, String password, String targetLocation, String targetFileName, String proxyHost, String proxyPort) {
-        FileDownloadOperation fileDownloadOperation = new FileDownloadOperation(url, userName, password, targetLocation, targetFileName, proxyHost, proxyPort);
+    public void fileDownloadOperation(
+            String url,
+            String userName,
+            String password,
+            String targetLocation,
+            String targetFileName,
+            String proxyHost,
+            String proxyPort) {
+        FileDownloadOperation fileDownloadOperation = new FileDownloadOperation(
+                url, userName, password, targetLocation, targetFileName, proxyHost, proxyPort);
         fileOperations.add(fileDownloadOperation);
     }
 
@@ -86,7 +97,8 @@ public class FileOperationsJobDslContext implements Context {
     }
 
     public void filePropertiesToJsonOperation(String sourceFile, String targetFile) {
-        FilePropertiesToJsonOperation filePropertiesToJsonOperation = new FilePropertiesToJsonOperation(sourceFile, targetFile);
+        FilePropertiesToJsonOperation filePropertiesToJsonOperation =
+                new FilePropertiesToJsonOperation(sourceFile, targetFile);
         fileOperations.add(filePropertiesToJsonOperation);
     }
 

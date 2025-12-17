@@ -8,14 +8,13 @@ import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.remoting.VirtualChannel;
+import hudson.util.DirScanner;
+import java.io.File;
+import java.io.Serializable;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
-
-import java.io.File;
-import hudson.util.DirScanner;
-import java.io.Serializable;
 
 public class FileCopyOperation extends FileOperation implements Serializable {
     private final String includes;
@@ -28,13 +27,14 @@ public class FileCopyOperation extends FileOperation implements Serializable {
     private Boolean useDefaultExcludes;
 
     @DataBoundConstructor
-    public FileCopyOperation(String includes,
-                             String excludes,
-                             String targetLocation,
-                             boolean flattenFiles,
-                             boolean renameFiles,
-                             String sourceCaptureExpression,
-                             String targetNameExpression) {
+    public FileCopyOperation(
+            String includes,
+            String excludes,
+            String targetLocation,
+            boolean flattenFiles,
+            boolean renameFiles,
+            String sourceCaptureExpression,
+            String targetNameExpression) {
         this.includes = includes;
         this.excludes = excludes;
         this.targetLocation = targetLocation;
@@ -84,15 +84,16 @@ public class FileCopyOperation extends FileOperation implements Serializable {
             EnvVars envVars = run.getEnvironment(listener);
             try {
                 FilePath ws = new FilePath(buildWorkspace, ".");
-                result = ws.act(new TargetFileCallable(listener,
-                                                       envVars.expand(includes),
-                                                       envVars.expand(excludes),
-                                                       envVars.expand(targetLocation),
-                                                       flattenFiles,
-                                                       renameFiles,
-                                                       sourceCaptureExpression,
-                                                       targetNameExpression,
-                                                       useDefaultExcludes));
+                result = ws.act(new TargetFileCallable(
+                        listener,
+                        envVars.expand(includes),
+                        envVars.expand(excludes),
+                        envVars.expand(targetLocation),
+                        flattenFiles,
+                        renameFiles,
+                        sourceCaptureExpression,
+                        targetNameExpression,
+                        useDefaultExcludes));
             } catch (RuntimeException e) {
                 listener.getLogger().println(e.getMessage());
                 throw e;
@@ -119,15 +120,16 @@ public class FileCopyOperation extends FileOperation implements Serializable {
         private final String targetNameExpression;
         private final boolean useDefaultExcludes;
 
-        public TargetFileCallable(TaskListener Listener,
-                                  String ResolvedIncludes,
-                                  String ResolvedExcludes,
-                                  String ResolvedTargetLocation,
-                                  boolean flattenFiles,
-                                  boolean renameFiles,
-                                  String sourceCaptureExpression,
-                                  String targetNameExpression,
-                                  boolean UseDefaultExcludes) {
+        public TargetFileCallable(
+                TaskListener Listener,
+                String ResolvedIncludes,
+                String ResolvedExcludes,
+                String ResolvedTargetLocation,
+                boolean flattenFiles,
+                boolean renameFiles,
+                String sourceCaptureExpression,
+                String targetNameExpression,
+                boolean UseDefaultExcludes) {
             this.listener = Listener;
             this.resolvedIncludes = ResolvedIncludes;
             this.resolvedExcludes = ResolvedExcludes;
@@ -147,16 +149,19 @@ public class FileCopyOperation extends FileOperation implements Serializable {
                 FilePath fpTL = new FilePath(fpWS, resolvedTargetLocation);
                 FilePath[] resolvedFiles = fpWS.list(resolvedIncludes, resolvedExcludes, useDefaultExcludes);
                 if (resolvedFiles.length == 0) {
-                    listener.getLogger().println("0 files found for include pattern '" + resolvedIncludes + "' and exclude pattern '" + resolvedExcludes + "'");
+                    listener.getLogger()
+                            .println("0 files found for include pattern '" + resolvedIncludes
+                                    + "' and exclude pattern '" + resolvedExcludes + "'");
                 }
                 if (flattenFiles) {
                     for (FilePath item : resolvedFiles) {
                         if (renameFiles) {
-                            final String relativePath = item.getRemote()
-                                    .replace(fpWS.getRemote(), ".");
-                            final String relativeTargetFileName = relativePath
-                                    .replaceAll(sourceCaptureExpression, targetNameExpression);
-                            final String targetFileName = relativePath.equals(relativeTargetFileName) ? item.getName() : relativeTargetFileName;
+                            final String relativePath = item.getRemote().replace(fpWS.getRemote(), ".");
+                            final String relativeTargetFileName =
+                                    relativePath.replaceAll(sourceCaptureExpression, targetNameExpression);
+                            final String targetFileName = relativePath.equals(relativeTargetFileName)
+                                    ? item.getName()
+                                    : relativeTargetFileName;
                             FilePath fpTF = new FilePath(fpTL, targetFileName);
                             listener.getLogger().println("Copy from " + item.getRemote() + " to " + fpTF);
                             item.copyTo(fpTF);
@@ -170,7 +175,10 @@ public class FileCopyOperation extends FileOperation implements Serializable {
                     for (FilePath item : resolvedFiles) {
                         listener.getLogger().println(item.getRemote());
                     }
-                    fpWS.copyRecursiveTo(new DirScanner.Glob(resolvedIncludes, resolvedExcludes, useDefaultExcludes), fpTL, resolvedIncludes);
+                    fpWS.copyRecursiveTo(
+                            new DirScanner.Glob(resolvedIncludes, resolvedExcludes, useDefaultExcludes),
+                            fpTL,
+                            resolvedIncludes);
                     result = true;
                 }
             } catch (RuntimeException e) {
@@ -184,9 +192,7 @@ public class FileCopyOperation extends FileOperation implements Serializable {
         }
 
         @Override
-        public void checkRoles(RoleChecker checker) throws SecurityException {
-
-        }
+        public void checkRoles(RoleChecker checker) throws SecurityException {}
     }
 
     @Extension

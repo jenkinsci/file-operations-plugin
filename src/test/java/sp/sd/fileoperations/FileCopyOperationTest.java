@@ -2,20 +2,18 @@ package sp.sd.fileoperations;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import com.thoughtworks.xstream.XStream;
+import com.thoughtworks.xstream.security.AnyTypePermission;
+import hudson.model.FreeStyleBuild;
+import hudson.model.FreeStyleProject;
+import hudson.model.Result;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import com.thoughtworks.xstream.XStream;
-import com.thoughtworks.xstream.security.AnyTypePermission;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.WithoutJenkins;
-
-import hudson.model.FreeStyleBuild;
-import hudson.model.FreeStyleProject;
-import hudson.model.Result;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 @WithJenkins
@@ -59,12 +57,19 @@ class FileCopyOperationTest {
 
         // Then
         assertEquals(Result.SUCCESS, build.getResult());
-        assertTrue(build.getWorkspace().child("test-results/test-results-xml/pod-0/classA/TestA.xml").exists());
-        assertTrue(build.getWorkspace().child("test-results/test-results-xml/pod-0/classB/TestB.xml").exists());
-        assertTrue(build.getWorkspace().child("test-results/test-results-xml/pod-1/classB/TestB.xml").exists());
-        assertTrue(build.getWorkspace().child("test-results/test-results-xml/pod-1/classC/TestC.xml").exists());
+        assertTrue(build.getWorkspace()
+                .child("test-results/test-results-xml/pod-0/classA/TestA.xml")
+                .exists());
+        assertTrue(build.getWorkspace()
+                .child("test-results/test-results-xml/pod-0/classB/TestB.xml")
+                .exists());
+        assertTrue(build.getWorkspace()
+                .child("test-results/test-results-xml/pod-1/classB/TestB.xml")
+                .exists());
+        assertTrue(build.getWorkspace()
+                .child("test-results/test-results-xml/pod-1/classC/TestC.xml")
+                .exists());
     }
-
 
     @Test
     void testRunFileOperationWithFileOperationBuildStepWithFlatten() throws Exception {
@@ -105,8 +110,8 @@ class FileCopyOperationTest {
                 "test-results",
                 true,
                 true,
-                ".*" + dirSep + "test-results-xml" + dirSep + ".*-([\\d]+)" +
-                        dirSep + ".*" + dirSep + "([^" + dirSep + "]+)$",
+                ".*" + dirSep + "test-results-xml" + dirSep + ".*-([\\d]+)" + dirSep + ".*" + dirSep + "([^" + dirSep
+                        + "]+)$",
                 "$1-$2"));
 
         // When
@@ -135,13 +140,7 @@ class FileCopyOperationTest {
         fop.add(new FileCreateOperation("dir1/info-app.txt", ""));
         fop.add(new FileCreateOperation("dir1/error-app.txt", ""));
         fop.add(new FileCopyOperation(
-                "**/dir1/*.txt",
-                "",
-                "logs",
-                true,
-                true,
-                "dir1" + dirSep + "(.*)-app\\.txt$",
-                "$1.log"));
+                "**/dir1/*.txt", "", "logs", true, true, "dir1" + dirSep + "(.*)-app\\.txt$", "$1.log"));
 
         // When
         FreeStyleProject p1 = jenkins.createFreeStyleProject("build1");
@@ -191,7 +190,8 @@ class FileCopyOperationTest {
     void testRunFileOperationWithFileOperationBuildStepWithDefaultExcludes() throws Exception {
         // Given
         FileCreateOperation fileCreateOperation = new FileCreateOperation(".gitignore", "");
-        FileCopyOperation fileCopyOperation = new FileCopyOperation(".gitignore", "", "output", false, false, null, null);
+        FileCopyOperation fileCopyOperation =
+                new FileCopyOperation(".gitignore", "", "output", false, false, null, null);
         List<FileOperation> fop = Arrays.asList(fileCreateOperation, fileCopyOperation);
 
         // When
@@ -209,7 +209,8 @@ class FileCopyOperationTest {
     void testRunFileOperationWithFileOperationBuildStepWithoutDefaultExcludes() throws Exception {
         // Given
         FileCreateOperation fileCreateOperation = new FileCreateOperation(".gitignore", "");
-        FileCopyOperation fileCopyOperation = new FileCopyOperation(".gitignore", "", "output", false, false, null, null);
+        FileCopyOperation fileCopyOperation =
+                new FileCopyOperation(".gitignore", "", "output", false, false, null, null);
         fileCopyOperation.setUseDefaultExcludes(false);
         List<FileOperation> fop = Arrays.asList(fileCreateOperation, fileCopyOperation);
 
@@ -228,14 +229,15 @@ class FileCopyOperationTest {
     @WithoutJenkins
     void testSerializeWithXStream() {
         // Given
-        FileCopyOperation originalObject = new FileCopyOperation("include", "exclude", "output", false, false, null, null);
+        FileCopyOperation originalObject =
+                new FileCopyOperation("include", "exclude", "output", false, false, null, null);
         originalObject.setUseDefaultExcludes(false);
 
         // When
         XStream xstream = new XStream();
         xstream.addPermission(AnyTypePermission.ANY);
         String serializedObjectXml = xstream.toXML(originalObject);
-        FileCopyOperation deserializedObject = (FileCopyOperation)xstream.fromXML(serializedObjectXml);
+        FileCopyOperation deserializedObject = (FileCopyOperation) xstream.fromXML(serializedObjectXml);
 
         // Then
         assertEquals(originalObject.getIncludes(), deserializedObject.getIncludes());
@@ -252,20 +254,18 @@ class FileCopyOperationTest {
     @WithoutJenkins
     void testSerializeWithXStreamBackwardsCompatibility() {
         // Given
-        String serializedObjectXml =
-                "<FileCopyOperation>" +
-                "  <includes>include</includes>" +
-                "  <excludes>exclude</excludes>" +
-                "  <targetLocation>output</targetLocation>" +
-                "  <flattenFiles>false</flattenFiles>" +
-                "  <renameFiles>false</renameFiles>" +
-                "</FileCopyOperation>";
+        String serializedObjectXml = "<FileCopyOperation>" + "  <includes>include</includes>"
+                + "  <excludes>exclude</excludes>"
+                + "  <targetLocation>output</targetLocation>"
+                + "  <flattenFiles>false</flattenFiles>"
+                + "  <renameFiles>false</renameFiles>"
+                + "</FileCopyOperation>";
 
         // When
         XStream xstream = new XStream();
         xstream.alias("FileCopyOperation", FileCopyOperation.class);
         xstream.addPermission(AnyTypePermission.ANY);
-        FileCopyOperation deserializedObject = (FileCopyOperation)xstream.fromXML(serializedObjectXml);
+        FileCopyOperation deserializedObject = (FileCopyOperation) xstream.fromXML(serializedObjectXml);
 
         // Then
         assertTrue(deserializedObject.getUseDefaultExcludes());

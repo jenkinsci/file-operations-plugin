@@ -1,26 +1,23 @@
 package sp.sd.fileoperations;
 
+import edu.umd.cs.findbugs.annotations.NonNull;
 import hudson.AbortException;
+import hudson.Extension;
 import hudson.FilePath;
 import hudson.Launcher;
-import hudson.Extension;
 import hudson.model.AbstractProject;
 import hudson.model.Descriptor;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-import hudson.tasks.Builder;
 import hudson.tasks.BuildStepDescriptor;
-import org.jenkinsci.Symbol;
-import org.kohsuke.stapler.DataBoundConstructor;
-
-import java.util.List;
+import hudson.tasks.Builder;
 import java.util.ArrayList;
-
+import java.util.Collections;
+import java.util.List;
 import jenkins.model.Jenkins;
 import jenkins.tasks.SimpleBuildStep;
-
-import edu.umd.cs.findbugs.annotations.NonNull;
-import java.util.Collections;
+import org.jenkinsci.Symbol;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 public class FileOperationsBuilder extends Builder implements SimpleBuildStep {
 
@@ -28,7 +25,8 @@ public class FileOperationsBuilder extends Builder implements SimpleBuildStep {
 
     @DataBoundConstructor
     public FileOperationsBuilder(List<FileOperation> fileOperations) {
-        this.fileOperations = fileOperations == null ? new ArrayList<FileOperation>() : new ArrayList<FileOperation>(fileOperations);
+        this.fileOperations =
+                fileOperations == null ? new ArrayList<FileOperation>() : new ArrayList<FileOperation>(fileOperations);
     }
 
     public List<FileOperation> getFileOperations() {
@@ -36,7 +34,8 @@ public class FileOperationsBuilder extends Builder implements SimpleBuildStep {
     }
 
     @Override
-    public void perform(@NonNull Run build, @NonNull FilePath workspace, @NonNull Launcher launcher, @NonNull TaskListener listener)
+    public void perform(
+            @NonNull Run build, @NonNull FilePath workspace, @NonNull Launcher launcher, @NonNull TaskListener listener)
             throws AbortException {
         boolean result = false;
         if (fileOperations.size() > 0) {
@@ -53,12 +52,10 @@ public class FileOperationsBuilder extends Builder implements SimpleBuildStep {
         }
     }
 
-
     @Override
     public DescriptorImpl getDescriptor() {
         return (DescriptorImpl) super.getDescriptor();
     }
-
 
     @Extension
     @Symbol("fileOperations")
@@ -75,7 +72,6 @@ public class FileOperationsBuilder extends Builder implements SimpleBuildStep {
         public String getDisplayName() {
             return "File Operations";
         }
-
 
         @SuppressWarnings("unused")
         public List<FileOperationDescriptor> getFileOperationDescriptors() {
@@ -94,4 +90,3 @@ public class FileOperationsBuilder extends Builder implements SimpleBuildStep {
         }
     }
 }
-

@@ -1,45 +1,38 @@
 package sp.sd.fileoperations;
 
 import edu.umd.cs.findbugs.annotations.NonNull;
+import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
 import hudson.EnvVars;
-import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.FilePath.FileCallable;
+import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-
-import hudson.util.Secret;
-
-import org.apache.hc.client5.http.auth.AuthCache;
-import org.apache.hc.client5.http.impl.DefaultRedirectStrategy;
-import org.apache.hc.client5.http.impl.classic.*;
-import org.jenkinsci.Symbol;
-import org.kohsuke.stapler.DataBoundConstructor;
-
-import edu.umd.cs.findbugs.annotations.SuppressFBWarnings;
-
-import java.io.FileOutputStream;
-import java.io.File;
-import java.io.OutputStream;
-
-import hudson.FilePath.FileCallable;
 import hudson.remoting.VirtualChannel;
-import org.apache.hc.core5.http.HttpEntity;
-import org.apache.hc.core5.http.HttpHost;
-import org.apache.hc.core5.http.HttpStatus;
-import org.apache.hc.client5.http.auth.AuthScope;
-import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
-import org.apache.hc.client5.http.classic.methods.HttpGet;
-import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
-import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
-import org.apache.hc.client5.http.protocol.HttpClientContext;
-import org.apache.hc.client5.http.impl.auth.BasicScheme;
-import org.jenkinsci.remoting.RoleChecker;
-
+import hudson.util.Secret;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStream;
 import java.io.Serial;
 import java.io.Serializable;
 import java.net.URI;
-
+import org.apache.hc.client5.http.auth.AuthCache;
+import org.apache.hc.client5.http.auth.AuthScope;
+import org.apache.hc.client5.http.auth.UsernamePasswordCredentials;
+import org.apache.hc.client5.http.classic.methods.HttpGet;
+import org.apache.hc.client5.http.impl.DefaultRedirectStrategy;
+import org.apache.hc.client5.http.impl.auth.BasicAuthCache;
+import org.apache.hc.client5.http.impl.auth.BasicCredentialsProvider;
+import org.apache.hc.client5.http.impl.auth.BasicScheme;
+import org.apache.hc.client5.http.impl.classic.*;
+import org.apache.hc.client5.http.protocol.HttpClientContext;
+import org.apache.hc.core5.http.HttpEntity;
+import org.apache.hc.core5.http.HttpHost;
+import org.apache.hc.core5.http.HttpStatus;
+import org.jenkinsci.Symbol;
+import org.jenkinsci.remoting.RoleChecker;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 public class FileDownloadOperation extends FileOperation implements Serializable {
     private final String url;
@@ -51,14 +44,21 @@ public class FileDownloadOperation extends FileOperation implements Serializable
     private final String proxyPort;
 
     @DataBoundConstructor
-    public FileDownloadOperation(String url, String userName, String password, String targetLocation, String targetFileName, String proxyHost, String proxyPort) {
+    public FileDownloadOperation(
+            String url,
+            String userName,
+            String password,
+            String targetLocation,
+            String targetFileName,
+            String proxyHost,
+            String proxyPort) {
         this.url = url;
         this.userName = userName;
         this.targetLocation = targetLocation;
         this.targetFileName = targetFileName;
         this.password = Secret.fromString(password).getEncryptedValue();
-        this.proxyHost=proxyHost;
-        this.proxyPort=proxyPort;
+        this.proxyHost = proxyHost;
+        this.proxyPort = proxyPort;
     }
 
     public String getUrl() {
@@ -98,7 +98,8 @@ public class FileDownloadOperation extends FileOperation implements Serializable
             EnvVars envVars = run.getEnvironment(listener);
             try {
                 FilePath ws = new FilePath(buildWorkspace, ".");
-                result = ws.act(new TargetFileCallable(listener,
+                result = ws.act(new TargetFileCallable(
+                        listener,
                         envVars.expand(url),
                         envVars.expand(userName),
                         envVars.expand(Secret.decrypt(password).getPlainText()),
@@ -120,6 +121,7 @@ public class FileDownloadOperation extends FileOperation implements Serializable
     private static final class TargetFileCallable implements FileCallable<Boolean> {
         @Serial
         private static final long serialVersionUID = 1;
+
         private final TaskListener listener;
         private final String resolvedUrl;
         private final String resolvedUserName;
@@ -129,7 +131,15 @@ public class FileDownloadOperation extends FileOperation implements Serializable
         private final String proxyHost;
         private final String proxyPort;
 
-        public TargetFileCallable(TaskListener Listener, String ResolvedUrl, String ResolvedUserName, String ResolvedPassword, String ResolvedTargetLocation, String ResolvedTargetFileName, String proxyHost, String proxyPort) {
+        public TargetFileCallable(
+                TaskListener Listener,
+                String ResolvedUrl,
+                String ResolvedUserName,
+                String ResolvedPassword,
+                String ResolvedTargetLocation,
+                String ResolvedTargetFileName,
+                String proxyHost,
+                String proxyPort) {
             this.listener = Listener;
             this.resolvedUrl = ResolvedUrl;
             this.resolvedUserName = ResolvedUserName;
@@ -151,23 +161,24 @@ public class FileDownloadOperation extends FileOperation implements Serializable
                 listener.getLogger().println("Started downloading file from " + resolvedUrl);
                 HttpHost host = new HttpHost(uri.getScheme(), uri.getHost(), uri.getPort());
                 BasicCredentialsProvider credsProvider = new BasicCredentialsProvider();
-                UsernamePasswordCredentials credentials = new UsernamePasswordCredentials(resolvedUserName, resolvedPassword.toCharArray());
+                UsernamePasswordCredentials credentials =
+                        new UsernamePasswordCredentials(resolvedUserName, resolvedPassword.toCharArray());
                 credsProvider.setCredentials(new AuthScope(uri.getHost(), uri.getPort()), credentials);
                 AuthCache authCache = new BasicAuthCache();
                 BasicScheme basicAuth = new BasicScheme();
                 basicAuth.initPreemptive(credentials);
                 authCache.put(host, basicAuth);
 
-                HttpClientBuilder httpClientBuilder = HttpClients.custom()
-                        .setDefaultCredentialsProvider(credsProvider);
+                HttpClientBuilder httpClientBuilder = HttpClients.custom().setDefaultCredentialsProvider(credsProvider);
 
-                if (proxyHost != null && !proxyHost.isEmpty()
-                        && proxyPort != null && proxyPort.matches("[0-9]+")) {
+                if (proxyHost != null && !proxyHost.isEmpty() && proxyPort != null && proxyPort.matches("[0-9]+")) {
                     HttpHost proxy = new HttpHost(proxyHost, Integer.parseInt(proxyPort));
                     httpClientBuilder.setProxy(proxy);
                 }
 
-                CloseableHttpClient httpClient = httpClientBuilder.setRedirectStrategy(DefaultRedirectStrategy.INSTANCE).build();
+                CloseableHttpClient httpClient = httpClientBuilder
+                        .setRedirectStrategy(DefaultRedirectStrategy.INSTANCE)
+                        .build();
                 HttpGet httpGet = new HttpGet(uri);
                 HttpClientContext localContext = HttpClientContext.create();
                 if (!resolvedUserName.isEmpty() && !resolvedPassword.isEmpty()) {
@@ -195,9 +206,7 @@ public class FileDownloadOperation extends FileOperation implements Serializable
         }
 
         @Override
-        public void checkRoles(RoleChecker checker) throws SecurityException {
-
-        }
+        public void checkRoles(RoleChecker checker) throws SecurityException {}
     }
 
     @Extension
@@ -208,7 +217,5 @@ public class FileDownloadOperation extends FileOperation implements Serializable
         public String getDisplayName() {
             return "File Download";
         }
-
     }
-
 }

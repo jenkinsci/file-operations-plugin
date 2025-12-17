@@ -2,10 +2,15 @@ package sp.sd.fileoperations;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import hudson.FilePath;
+import hudson.model.FreeStyleBuild;
+import hudson.model.FreeStyleProject;
+import hudson.model.Result;
+import java.io.BufferedOutputStream;
+import java.io.FileOutputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.apache.commons.compress.archivers.tar.TarArchiveEntry;
 import org.apache.commons.compress.archivers.tar.TarArchiveOutputStream;
 import org.apache.commons.compress.compressors.gzip.GzipCompressorOutputStream;
@@ -14,14 +19,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.WithoutJenkins;
-
-import hudson.FilePath;
-import hudson.model.FreeStyleBuild;
-import hudson.model.FreeStyleProject;
-import hudson.model.Result;
-
-import java.io.FileOutputStream;
-import java.io.BufferedOutputStream;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 @WithJenkins
@@ -61,8 +58,8 @@ class FileUnTarOperationTest {
 
         // Create tar file
         FilePath tarFile = workspace.child("test.tar");
-        try (TarArchiveOutputStream out = new TarArchiveOutputStream(
-                new BufferedOutputStream(new FileOutputStream(tarFile.getRemote())))) {
+        try (TarArchiveOutputStream out =
+                new TarArchiveOutputStream(new BufferedOutputStream(new FileOutputStream(tarFile.getRemote())))) {
             out.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
 
             // Create entry for the file
@@ -113,9 +110,8 @@ class FileUnTarOperationTest {
 
         // Create tar.gz file
         FilePath tarGzFile = workspace.child("test.tar.gz");
-        try (TarArchiveOutputStream out = new TarArchiveOutputStream(
-                new GzipCompressorOutputStream(
-                    new BufferedOutputStream(new FileOutputStream(tarGzFile.getRemote()))))) {
+        try (TarArchiveOutputStream out = new TarArchiveOutputStream(new GzipCompressorOutputStream(
+                new BufferedOutputStream(new FileOutputStream(tarGzFile.getRemote()))))) {
             out.setLongFileMode(TarArchiveOutputStream.LONGFILE_GNU);
 
             // Create entry for the file

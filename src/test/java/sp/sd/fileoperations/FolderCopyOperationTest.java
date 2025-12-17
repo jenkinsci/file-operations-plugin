@@ -1,20 +1,19 @@
 package sp.sd.fileoperations;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
 import hudson.EnvVars;
 import hudson.FilePath;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
 import hudson.model.Result;
 import hudson.slaves.EnvironmentVariablesNodeProperty;
+import java.util.List;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
-
-import java.util.List;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
-
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 
 @WithJenkins
 class FolderCopyOperationTest {
@@ -90,4 +89,3 @@ class FolderCopyOperationTest {
         assertEquals("Sample content", copiedFile.readToString());
     }
 }
-
