@@ -1,22 +1,18 @@
 package sp.sd.fileoperations;
 
 import hudson.EnvVars;
-import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.FilePath.FileCallable;
+import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-
-import org.jenkinsci.Symbol;
-import org.kohsuke.stapler.DataBoundConstructor;
-
-import java.io.File;
-
-import hudson.FilePath.FileCallable;
 import hudson.remoting.VirtualChannel;
-import org.jenkinsci.remoting.RoleChecker;
-
+import java.io.File;
 import java.io.Serializable;
+import org.jenkinsci.Symbol;
+import org.jenkinsci.remoting.RoleChecker;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 public class FileCreateOperation extends FileOperation implements Serializable {
     private final String fileName;
@@ -43,7 +39,8 @@ public class FileCreateOperation extends FileOperation implements Serializable {
             EnvVars envVars = run.getEnvironment(listener);
             try {
                 FilePath ws = new FilePath(buildWorkspace, ".");
-                result = ws.act(new TargetFileCallable(listener, envVars.expand(fileName), envVars.expand(fileContent), envVars));
+                result = ws.act(new TargetFileCallable(
+                        listener, envVars.expand(fileName), envVars.expand(fileContent), envVars));
             } catch (Exception e) {
                 listener.fatalError(e.getMessage());
                 return false;
@@ -61,7 +58,8 @@ public class FileCreateOperation extends FileOperation implements Serializable {
         private final String resolvedFileName;
         private final String resolvedFileContent;
 
-        public TargetFileCallable(TaskListener Listener, String ResolvedFileName, String ResolvedFileContent, EnvVars environment) {
+        public TargetFileCallable(
+                TaskListener Listener, String ResolvedFileName, String ResolvedFileContent, EnvVars environment) {
             this.listener = Listener;
             this.resolvedFileName = ResolvedFileName;
             this.resolvedFileContent = ResolvedFileContent;
@@ -75,7 +73,9 @@ public class FileCreateOperation extends FileOperation implements Serializable {
                 FilePath fpWS = new FilePath(ws);
                 FilePath fpTL = new FilePath(fpWS, resolvedFileName);
                 if (fpTL.exists()) {
-                    listener.getLogger().println(resolvedFileName + " file already exists, replacing the content with the provided content.");
+                    listener.getLogger()
+                            .println(resolvedFileName
+                                    + " file already exists, replacing the content with the provided content.");
                 }
                 listener.getLogger().println("Creating file: " + fpTL.getRemote());
                 fpTL.write(resolvedFileContent, "UTF-8");
@@ -91,9 +91,7 @@ public class FileCreateOperation extends FileOperation implements Serializable {
         }
 
         @Override
-        public void checkRoles(RoleChecker checker) throws SecurityException {
-
-        }
+        public void checkRoles(RoleChecker checker) throws SecurityException {}
     }
 
     @Extension
@@ -102,6 +100,5 @@ public class FileCreateOperation extends FileOperation implements Serializable {
         public String getDisplayName() {
             return "File Create";
         }
-
     }
 }

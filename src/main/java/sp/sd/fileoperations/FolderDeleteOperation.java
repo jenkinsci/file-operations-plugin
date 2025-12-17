@@ -1,22 +1,18 @@
 package sp.sd.fileoperations;
 
 import hudson.EnvVars;
-import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.FilePath.FileCallable;
+import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-
-import org.jenkinsci.Symbol;
-import org.kohsuke.stapler.DataBoundConstructor;
-
-import java.io.File;
-
-import hudson.FilePath.FileCallable;
 import hudson.remoting.VirtualChannel;
-import org.jenkinsci.remoting.RoleChecker;
-
+import java.io.File;
 import java.io.Serializable;
+import org.jenkinsci.Symbol;
+import org.jenkinsci.remoting.RoleChecker;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 public class FolderDeleteOperation extends FileOperation implements Serializable {
     private final String folderPath;
@@ -80,9 +76,7 @@ public class FolderDeleteOperation extends FileOperation implements Serializable
         }
 
         @Override
-        public void checkRoles(RoleChecker checker) throws SecurityException {
-
-        }
+        public void checkRoles(RoleChecker checker) throws SecurityException {}
     }
 
     @Extension
@@ -91,6 +85,5 @@ public class FolderDeleteOperation extends FileOperation implements Serializable
         public String getDisplayName() {
             return "Folder Delete";
         }
-
     }
 }

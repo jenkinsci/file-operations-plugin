@@ -1,23 +1,19 @@
 package sp.sd.fileoperations;
 
 import hudson.EnvVars;
-import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.FilePath.FileCallable;
+import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-
+import hudson.remoting.VirtualChannel;
+import java.io.File;
+import java.io.Serializable;
 import org.jenkinsci.Symbol;
+import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.DataBoundConstructor;
 import org.kohsuke.stapler.DataBoundSetter;
-
-import java.io.File;
-
-import hudson.FilePath.FileCallable;
-import hudson.remoting.VirtualChannel;
-import org.jenkinsci.remoting.RoleChecker;
-
-import java.io.Serializable;
 
 public class FileTransformOperation extends FileOperation implements Serializable {
     private final String includes;
@@ -50,7 +46,8 @@ public class FileTransformOperation extends FileOperation implements Serializabl
             EnvVars envVars = run.getEnvironment(listener);
             try {
                 FilePath ws = new FilePath(buildWorkspace, ".");
-                result = ws.act(new TargetFileCallable(listener, envVars.expand(includes), envVars.expand(excludes), useDefaultExcludes, envVars));
+                result = ws.act(new TargetFileCallable(
+                        listener, envVars.expand(includes), envVars.expand(excludes), useDefaultExcludes, envVars));
             } catch (Exception e) {
                 listener.fatalError(e.getMessage());
                 return false;
@@ -70,7 +67,12 @@ public class FileTransformOperation extends FileOperation implements Serializabl
         private final String resolvedExcludes;
         private final boolean useDefaultExcludes;
 
-        public TargetFileCallable(TaskListener Listener, String ResolvedIncludes, String ResolvedExcludes, boolean UseDefaultExcludes, EnvVars environment) {
+        public TargetFileCallable(
+                TaskListener Listener,
+                String ResolvedIncludes,
+                String ResolvedExcludes,
+                boolean UseDefaultExcludes,
+                EnvVars environment) {
             this.listener = Listener;
             this.resolvedIncludes = ResolvedIncludes;
             this.resolvedExcludes = ResolvedExcludes;
@@ -85,7 +87,9 @@ public class FileTransformOperation extends FileOperation implements Serializabl
                 FilePath fpWS = new FilePath(ws);
                 FilePath[] resolvedFiles = fpWS.list(resolvedIncludes, resolvedExcludes, useDefaultExcludes);
                 if (resolvedFiles.length == 0) {
-                    listener.getLogger().println("0 files found for include pattern '" + resolvedIncludes + "' and exclude pattern '" + resolvedExcludes + "'");
+                    listener.getLogger()
+                            .println("0 files found for include pattern '" + resolvedIncludes
+                                    + "' and exclude pattern '" + resolvedExcludes + "'");
                     result = true;
                 } else {
                     for (FilePath item : resolvedFiles) {
@@ -107,9 +111,7 @@ public class FileTransformOperation extends FileOperation implements Serializabl
         }
 
         @Override
-        public void checkRoles(RoleChecker checker) throws SecurityException {
-
-        }
+        public void checkRoles(RoleChecker checker) throws SecurityException {}
     }
 
     @Extension

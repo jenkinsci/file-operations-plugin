@@ -3,21 +3,19 @@ package sp.sd.fileoperations;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import hudson.FilePath;
+import hudson.model.FreeStyleBuild;
+import hudson.model.FreeStyleProject;
+import hudson.model.Result;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.WithoutJenkins;
-
-import hudson.FilePath;
-import hudson.model.FreeStyleBuild;
-import hudson.model.FreeStyleProject;
-import hudson.model.Result;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 @WithJenkins
@@ -53,7 +51,7 @@ class FileUnZipOperationTest {
         FilePath zipFile = workspace.child("test.zip");
 
         try (OutputStream os = zipFile.write();
-             ZipOutputStream zipOut = new ZipOutputStream(os)) {
+                ZipOutputStream zipOut = new ZipOutputStream(os)) {
 
             // Add a file entry
             ZipEntry entry = new ZipEntry("test-file.txt");
@@ -120,7 +118,7 @@ class FileUnZipOperationTest {
         String newContent = "new content";
 
         try (OutputStream os = zipFile.write();
-             ZipOutputStream zipOut = new ZipOutputStream(os)) {
+                ZipOutputStream zipOut = new ZipOutputStream(os)) {
 
             ZipEntry entry = new ZipEntry("new-file.txt");
             zipOut.putNextEntry(entry);

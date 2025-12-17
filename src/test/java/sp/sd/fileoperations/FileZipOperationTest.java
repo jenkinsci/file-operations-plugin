@@ -2,17 +2,15 @@ package sp.sd.fileoperations;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import hudson.model.FreeStyleBuild;
+import hudson.model.FreeStyleProject;
+import hudson.model.Result;
 import java.util.ArrayList;
 import java.util.List;
-
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.WithoutJenkins;
-
-import hudson.model.FreeStyleBuild;
-import hudson.model.FreeStyleProject;
-import hudson.model.Result;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
 
 @WithJenkins
@@ -48,9 +46,15 @@ class FileZipOperationTest {
 
         assertEquals(Result.SUCCESS, build.getResult());
         assertTrue(build.getWorkspace().child("unzipped-directory").exists());
-        assertTrue(build.getWorkspace().child("unzipped-directory/source-directory/nested-folder1/TestFile1-1").exists());
-        assertTrue(build.getWorkspace().child("unzipped-directory/source-directory/nested-folder2/TestFile2-1").exists());
-        assertTrue(build.getWorkspace().child("unzipped-directory/source-directory/nested-folder2/TestFile2-2").exists());
+        assertTrue(build.getWorkspace()
+                .child("unzipped-directory/source-directory/nested-folder1/TestFile1-1")
+                .exists());
+        assertTrue(build.getWorkspace()
+                .child("unzipped-directory/source-directory/nested-folder2/TestFile2-1")
+                .exists());
+        assertTrue(build.getWorkspace()
+                .child("unzipped-directory/source-directory/nested-folder2/TestFile2-2")
+                .exists());
     }
 
     @Test
@@ -78,17 +82,22 @@ class FileZipOperationTest {
         fop.add(new FileCreateOperation("source-directory/nested-folder2/TestFile2-2", ""));
         fop.add(new FileZipOperation("source-directory", "output-directory/nested-output-folder1"));
         fop.add(new FileUnZipOperation(
-            "output-directory/nested-output-folder1/source-directory.zip",
-            "unzipped-directory"));
+                "output-directory/nested-output-folder1/source-directory.zip", "unzipped-directory"));
         p1.getBuildersList().add(new FileOperationsBuilder(fop));
 
         FreeStyleBuild build = p1.scheduleBuild2(0).get();
 
         assertEquals(Result.SUCCESS, build.getResult());
         assertTrue(build.getWorkspace().child("unzipped-directory").exists());
-        assertTrue(build.getWorkspace().child("unzipped-directory/source-directory/nested-folder1/TestFile1-1").exists());
-        assertTrue(build.getWorkspace().child("unzipped-directory/source-directory/nested-folder2/TestFile2-1").exists());
-        assertTrue(build.getWorkspace().child("unzipped-directory/source-directory/nested-folder2/TestFile2-2").exists());
+        assertTrue(build.getWorkspace()
+                .child("unzipped-directory/source-directory/nested-folder1/TestFile1-1")
+                .exists());
+        assertTrue(build.getWorkspace()
+                .child("unzipped-directory/source-directory/nested-folder2/TestFile2-1")
+                .exists());
+        assertTrue(build.getWorkspace()
+                .child("unzipped-directory/source-directory/nested-folder2/TestFile2-2")
+                .exists());
     }
 
     @Test
@@ -97,11 +106,8 @@ class FileZipOperationTest {
         List<FileOperation> fop = new ArrayList<>();
         fop.add(new FileCreateOperation("source-directory/nested-folder1/TestFile1-1", ""));
         fop.add(new FileZipOperation(
-            "source-directory/nested-folder1/TestFile1-1",
-            "output-directory/nested-output-folder1"));
-        fop.add(new FileUnZipOperation(
-            "output-directory/nested-output-folder1/TestFile1-1.zip",
-            "unzipped-directory"));
+                "source-directory/nested-folder1/TestFile1-1", "output-directory/nested-output-folder1"));
+        fop.add(new FileUnZipOperation("output-directory/nested-output-folder1/TestFile1-1.zip", "unzipped-directory"));
         p1.getBuildersList().add(new FileOperationsBuilder(fop));
 
         FreeStyleBuild build = p1.scheduleBuild2(0).get();

@@ -8,12 +8,11 @@ import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
 import hudson.remoting.VirtualChannel;
+import java.io.File;
+import java.io.Serializable;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.DataBoundConstructor;
-
-import java.io.File;
-import java.io.Serializable;
 
 public class FolderRenameOperation extends FileOperation implements Serializable {
     private final String source;
@@ -73,13 +72,12 @@ public class FolderRenameOperation extends FileOperation implements Serializable
             try {
                 FilePath fpWS = new FilePath(ws);
                 FilePath fpSL = new FilePath(fpWS, resolvedSource);
-                if(fpSL.exists()) {
+                if (fpSL.exists()) {
                     FilePath fpDL = new FilePath(fpWS, resolvedDestination);
                     fpSL.renameTo(fpDL);
                     result = true;
-                }
-                else {
-                    listener.fatalError("The source folder"+ fpSL.getRemote()  +" doesn't exist.");
+                } else {
+                    listener.fatalError("The source folder" + fpSL.getRemote() + " doesn't exist.");
                 }
             } catch (RuntimeException e) {
                 listener.fatalError(e.getMessage());
@@ -92,9 +90,7 @@ public class FolderRenameOperation extends FileOperation implements Serializable
         }
 
         @Override
-        public void checkRoles(RoleChecker checker) throws SecurityException {
-
-        }
+        public void checkRoles(RoleChecker checker) throws SecurityException {}
     }
 
     @Extension
@@ -103,6 +99,5 @@ public class FolderRenameOperation extends FileOperation implements Serializable
         public String getDisplayName() {
             return "Folder Rename";
         }
-
     }
 }

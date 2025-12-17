@@ -1,22 +1,18 @@
 package sp.sd.fileoperations;
 
 import hudson.EnvVars;
-import hudson.Launcher;
 import hudson.Extension;
 import hudson.FilePath;
+import hudson.FilePath.FileCallable;
+import hudson.Launcher;
 import hudson.model.Run;
 import hudson.model.TaskListener;
-
-import org.jenkinsci.Symbol;
-import org.kohsuke.stapler.DataBoundConstructor;
-
-import java.io.File;
-
-import hudson.FilePath.FileCallable;
 import hudson.remoting.VirtualChannel;
-import org.jenkinsci.remoting.RoleChecker;
-
+import java.io.File;
 import java.io.Serializable;
+import org.jenkinsci.Symbol;
+import org.jenkinsci.remoting.RoleChecker;
+import org.kohsuke.stapler.DataBoundConstructor;
 
 public class FileUnTarOperation extends FileOperation implements Serializable {
     private final String filePath;
@@ -49,7 +45,8 @@ public class FileUnTarOperation extends FileOperation implements Serializable {
             EnvVars envVars = run.getEnvironment(listener);
             try {
                 FilePath ws = new FilePath(buildWorkspace, ".");
-                result = ws.act(new TargetFileCallable(listener, envVars.expand(filePath), envVars.expand(targetLocation), isGZIP));
+                result = ws.act(new TargetFileCallable(
+                        listener, envVars.expand(filePath), envVars.expand(targetLocation), isGZIP));
             } catch (RuntimeException e) {
                 listener.getLogger().println(e.getMessage());
                 throw e;
@@ -71,7 +68,8 @@ public class FileUnTarOperation extends FileOperation implements Serializable {
         private final String resolvedTargetLocation;
         private final boolean isGZIP;
 
-        public TargetFileCallable(TaskListener Listener, String ResolvedFilePath, String ResolvedTargetLocation, boolean isGZIP) {
+        public TargetFileCallable(
+                TaskListener Listener, String ResolvedFilePath, String ResolvedTargetLocation, boolean isGZIP) {
             this.listener = Listener;
             this.resolvedFilePath = ResolvedFilePath;
             this.resolvedTargetLocation = ResolvedTargetLocation;
@@ -110,9 +108,7 @@ public class FileUnTarOperation extends FileOperation implements Serializable {
         }
 
         @Override
-        public void checkRoles(RoleChecker checker) throws SecurityException {
-
-        }
+        public void checkRoles(RoleChecker checker) throws SecurityException {}
     }
 
     @Extension
@@ -121,6 +117,5 @@ public class FileUnTarOperation extends FileOperation implements Serializable {
         public String getDisplayName() {
             return "Untar";
         }
-
     }
 }
