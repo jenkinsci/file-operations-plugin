@@ -1,8 +1,5 @@
 package sp.sd.fileoperations;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import hudson.EnvVars;
 import hudson.Extension;
 import hudson.FilePath;
@@ -18,6 +15,9 @@ import java.util.regex.Pattern;
 import org.jenkinsci.Symbol;
 import org.jenkinsci.remoting.RoleChecker;
 import org.kohsuke.stapler.DataBoundConstructor;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
+import tools.jackson.databind.node.ObjectNode;
 
 public class FilePropertiesToJsonOperation extends FileOperation implements Serializable {
     private final String sourceFile;

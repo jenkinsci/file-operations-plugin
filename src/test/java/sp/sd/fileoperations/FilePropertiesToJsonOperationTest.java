@@ -3,8 +3,6 @@ package sp.sd.fileoperations;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import hudson.FilePath;
 import hudson.model.FreeStyleBuild;
 import hudson.model.FreeStyleProject;
@@ -18,6 +16,8 @@ import org.junit.jupiter.api.Test;
 import org.jvnet.hudson.test.JenkinsRule;
 import org.jvnet.hudson.test.WithoutJenkins;
 import org.jvnet.hudson.test.junit.jupiter.WithJenkins;
+import tools.jackson.databind.JsonNode;
+import tools.jackson.databind.ObjectMapper;
 
 @WithJenkins
 class FilePropertiesToJsonOperationTest {
@@ -83,7 +83,7 @@ class FilePropertiesToJsonOperationTest {
         // Parse and verify JSON content
         ObjectMapper mapper = new ObjectMapper();
         JsonNode jsonNode = mapper.readTree(jsonFile.read());
-        assertEquals("value", jsonNode.get("stringProp").asText());
+        assertEquals("value", jsonNode.get("stringProp").asString());
         assertEquals(123, jsonNode.get("intProp").asInt());
         assertEquals(123.45f, jsonNode.get("floatProp").floatValue(), 0.001);
         assertTrue(jsonNode.get("boolProp").asBoolean());
